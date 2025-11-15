@@ -1,7 +1,6 @@
 streamlit
 folium
 streamlit-folium
-geopy
 osmnx
 geopandas
 shapely
