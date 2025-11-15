@@ -1,7 +1,7 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
-from geopy.geocoders import Nominatim
+#from geopy.geocoders import Nominatim
 import osmnx as ox
 import geopandas as gpd
 from shapely.geometry import Point
@@ -14,15 +14,24 @@ import xlrd
 import requests
 import time
 import branca.colormap as cm# 8. Create a linear color scale for grade_abs
+from opencage.geocoder import OpenCageGeocode
 
+# Load OpenCage API key from Streamlit secrets
+OPENCAGE_KEY = st.secrets["opencage"]["api_key"]
 
+# Initialize the geocoder
+geocoder = OpenCageGeocode(OPENCAGE_KEY)
 
-geolocator = Nominatim(user_agent="Navigator")
+#geolocator = Nominatim(user_agent="Navigator")
 
 @st.cache_data(show_spinner=True, show_time = True)
 def geocode_address(address):
-    geolocator = Nominatim(user_agent="Navigator")
-    return geolocator.geocode(address)
+    # geolocator = Nominatim(user_agent="Navigator")
+    # return geolocator.geocode(address)
+    results = geocoder.geocode(address)
+    lat = results[0]['geometry']['lat']
+    lon = results[0]['geometry']['lng']
+    return lat, lon
 
 @st.cache_data(show_spinner=True, show_time = True)
 def get_osm_features(lat, lon, tags, dist):

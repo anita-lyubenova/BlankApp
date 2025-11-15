@@ -12,3 +12,4 @@ requests
 branca
 textwrap3
 xlrd
+opencage
