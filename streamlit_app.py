@@ -231,7 +231,7 @@ with tab_map:
             location = geocode_address(address)
     
             if location:
-                lat, lon = location.latitude, location.longitude
+                lat, lon = location.lat, location.lon
                 st.write(f"Coordinates: {lat}, {lon}")
                 
                 #Map --------------------------------------------------------------
