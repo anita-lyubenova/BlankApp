@@ -178,7 +178,20 @@ with tab_intro:
     - Markers for selected points of interest  
     """)
     
-    
+   # Initialize session state variables if they don't exist
+if "location" not in st.session_state:
+    st.session_state.location = None
+if "map" not in st.session_state:
+    st.session_state.map = None
+#Built environment feautres for the pie chart
+tags0 = {
+    'landuse': True,   # True → all landuse values
+    'natural': True,   # all natural features
+    'leisure': True,    # all leisure features
+    'amenity':True,
+   # 'shop':True,
+    'building': True,
+}
 # Main --------------------------------------------------------
 
 with tab_map:
@@ -213,15 +226,7 @@ with tab_map:
     if selected_poi:
         poi_tags=ms_index[ms_index['Multiselect'].isin(selected_poi)][["key", "value"]].groupby("key")["value"].apply(list).to_dict()
     
-    #Built environment: get POIs within 500m
-    tags0 = {
-        'landuse': True,   # True → all landuse values
-        'natural': True,   # all natural features
-        'leisure': True,    # all leisure features
-        'amenity':True,
-       # 'shop':True,
-        'building': True,
-    }
+    
     
     go_input = st.button("Go!")
     st.write("Button value:", go_input)
@@ -234,6 +239,7 @@ with tab_map:
     
             if location:
                 lat, lon = location
+                st.session_state.location = location  # Save coordinates in session_state
                 st.write(f"Coordinates: {lat}, {lon}")
                 
                 #Map --------------------------------------------------------------
@@ -249,6 +255,7 @@ with tab_map:
                     weight=2.5            
                     ).add_to(m)
                  
+                st.session_state.map = m 
                 # if no_landuse_input:
                 #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
                 #     #transform to long format
@@ -450,7 +457,8 @@ with tab_map:
                 
                 folium.LayerControl().add_to(m)
                 
-                st_folium(m,use_container_width=True)
+                if st.session_state.map:
+                    st_folium(st.session_state.map, width=700, height=500)
                 
                 # col1,col2 = st.columns(2, gap="small", border=True)    
                 
