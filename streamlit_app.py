@@ -384,7 +384,7 @@ with tab_map:
                         lon_, lat_ = row.geometry.centroid.xy
                         folium.Marker(
                             location=[lat_[0], lon_[0]],
-                            popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get("Category",'N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
+                            popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get('Category','N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
                             icon=folium.Icon(
                                 color=row['color'],
                                 icon=row['icon'].replace("fa-", "") if str(row['icon']).startswith("fa-") else row['icon'],
