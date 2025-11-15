@@ -12,3 +12,4 @@ branca
 textwrap3
 xlrd
 opencage
+scikit-learn
