@@ -227,6 +227,10 @@ with tab_map:
         poi_tags=ms_index[ms_index['Multiselect'].isin(selected_poi)][["key", "value"]].groupby("key")["value"].apply(list).to_dict()
     
     
+    if st.session_state.location:
+        st.write(st.session_state.location)
+    if st.session_state.map:
+        st_folium(st.session_state.map, width=700, height=500)
     
     go_input = st.button("Go!")
     st.write("Button value:", go_input)
@@ -256,8 +260,7 @@ with tab_map:
                     ).add_to(m)
                  
                 st.session_state.map = m 
-    if st.session_state.map:
-        st_folium(st.session_state.map, width=700, height=500)
+    
                 # if no_landuse_input:
                 #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
                 #     #transform to long format
