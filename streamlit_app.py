@@ -240,27 +240,28 @@ with tab_map:
         if address:
             
             location = geocode_address(address)
-    
-            if location:
-                lat, lon = location
-                st.session_state.location = location  # Save coordinates in session_state
-                st.write(f"Coordinates: {lat}, {lon}")
-                
-                #Map --------------------------------------------------------------
-                
-                m = folium.Map(location=[lat, lon], zoom_start=14)         
-                # Add address marker
-                folium.Marker([lat, lon], popup=address, icon=folium.Icon(color='red', icon='home')).add_to(m)
-                folium.Circle(
-                    location=[lat, lon],
-                    radius=POI_radius,  # in meters
-                    color='black',       
-                    fill=False,
-                    weight=2.5            
-                    ).add_to(m)
-                 
-                st.session_state.map = m 
-    
+        
+            lat, lon = location
+            st.session_state.location = location  # Save coordinates in session_state
+            st.write(f"Coordinates: {lat}, {lon}")
+            
+            #Map --------------------------------------------------------------
+            
+            m = folium.Map(location=[lat, lon], zoom_start=14)         
+            # Add address marker
+            folium.Marker([lat, lon], popup=address, icon=folium.Icon(color='red', icon='home')).add_to(m)
+            folium.Circle(
+                location=[lat, lon],
+                radius=POI_radius,  # in meters
+                color='black',       
+                fill=False,
+                weight=2.5            
+                ).add_to(m)
+             
+            st.session_state.map = m 
+        else:
+            st.error("Address not found!")
+
                 # if no_landuse_input:
                 #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
                 #     #transform to long format
@@ -460,7 +461,7 @@ with tab_map:
                 
                 
                 
-                folium.LayerControl().add_to(m)
+                # folium.LayerControl().add_to(m)
                 
                 
                 
@@ -504,5 +505,5 @@ with tab_map:
                     
     
     
-            else:
-                st.error("Address not found!")
+            # else:
+            #     st.error("Address not found!")
