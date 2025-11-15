@@ -198,10 +198,10 @@ with tab_map:
     cont_input = st.container()
     col_address, col_features = cont_input.columns(spec= [0.3, 0.7], gap="small", border=True)
     with col_address:
-        address = st.text_input("Enter an address:", value ="Skaldevägen 60")
-        POI_radius=st.slider('Show PoIs within:', min_value=100, max_value=2000, value=500)
+        st.text_input("Enter an address:", value ="Skaldevägen 60", key="address")
+        st.slider('Show PoIs within:', min_value=100, max_value=2000, value=500, key="POI_radius")
         
-        no_landuse_input = st.checkbox("Show land use distribution (might take more time)", value =True)
+        st.checkbox("Show land use distribution (might take more time)", value =True, key = "landuse_input")
     
     with col_features:
         st.write("Select points of interest you'd like to have in the area")
@@ -237,9 +237,9 @@ with tab_map:
     # If user enters an address => find latitude and longitude
     if go_input:
         
-        if address:
+        if st.session_state.address:
             
-            location = geocode_address(address)
+            location = geocode_address(st.session_state.address)
         
             lat, lon = location
             st.session_state.location = location  # Save coordinates in session_state
@@ -249,10 +249,10 @@ with tab_map:
             
             m = folium.Map(location=[lat, lon], zoom_start=14)         
             # Add address marker
-            folium.Marker([lat, lon], popup=address, icon=folium.Icon(color='red', icon='home')).add_to(m)
+            folium.Marker([lat, lon], popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(m)
             folium.Circle(
                 location=[lat, lon],
-                radius=POI_radius,  # in meters
+                radius=st.session_state.POI_radius,  # in meters
                 color='black',       
                 fill=False,
                 weight=2.5            
