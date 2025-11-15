@@ -223,9 +223,10 @@ with tab_map:
         'building': True,
     }
     
-    
+    go_input = st.button("Go!")
+    st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
-    if st.button("Go!"):
+    if go_input:
         
         if address:
             
