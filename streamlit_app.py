@@ -448,40 +448,41 @@ with tab_map:
                 
                 
                 folium.LayerControl().add_to(m)
+                st_folium(m,use_container_width=True)
                 
-                col1,col2 = st.columns(2, gap="small", border=True)    
+                # col1,col2 = st.columns(2, gap="small", border=True)    
                 
-                with col1:
-                    # st.subheader("Map")
-                    # st.write("Here you can see land use patterns, elevation profile and where your points of interest are located")
-                    st_folium(m,use_container_width=True)
+                # with col1:
+                #     # st.subheader("Map")
+                #     # st.write("Here you can see land use patterns, elevation profile and where your points of interest are located")
+                #     st_folium(m,use_container_width=True)
                     
-                    with st.popover("Degree reference values"):
-                        st.markdown("""
-                            - **0–2%**: Very flat street, easy to walk or bike  
-                            - **2–5%**: Slight incline, barely noticeable  
-                            - **5–8%**: Moderate slope, noticeable uphill effort  
-                            - **8–12%**: Steep street, challenging for bikes or long walks  
-                            - **>12%**: Very steep, strenuous; may be difficult for vehicles, bicycles, or accessibility
-                            """)
-                    st.header("Nearest points of interest")
+                #     with st.popover("Degree reference values"):
+                #         st.markdown("""
+                #             - **0–2%**: Very flat street, easy to walk or bike  
+                #             - **2–5%**: Slight incline, barely noticeable  
+                #             - **5–8%**: Moderate slope, noticeable uphill effort  
+                #             - **8–12%**: Steep street, challenging for bikes or long walks  
+                #             - **>12%**: Very steep, strenuous; may be difficult for vehicles, bicycles, or accessibility
+                #             """)
+                #     st.header("Nearest points of interest")
                             
-                    if 'resdf' in locals() and not resdf.empty:
-                        st.dataframe(resdf, key="nearest_pois")
-                    else:
-                        st.info("No Points of interest selected.")
+                #     if 'resdf' in locals() and not resdf.empty:
+                #         st.dataframe(resdf, key="nearest_pois")
+                #     else:
+                #         st.info("No Points of interest selected.")
                     
                     
-                with col2:
-                    st.subheader("Land use distribution")
+                # with col2:
+                #     st.subheader("Land use distribution")
                     
-                    if 'fig' in locals():
-                        st.plotly_chart(fig,
-                                        use_container_width=True,
-                                        key="landuse_pie",
-                                        config = {'height': fig_height})
-                    else:
-                        st.info("No landuse characteristics were obtained. If you want to see the landuse distribution, mark the checkbox")
+                #     if 'fig' in locals():
+                #         st.plotly_chart(fig,
+                #                         use_container_width=True,
+                #                         key="landuse_pie",
+                #                         config = {'height': fig_height})
+                #     else:
+                #         st.info("No landuse characteristics were obtained. If you want to see the landuse distribution, mark the checkbox")
                    
                     
                
