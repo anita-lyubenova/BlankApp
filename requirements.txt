@@ -1,1 +1,13 @@
 streamlit
+folium
+streamlit-folium
+geopy
+osmnx
+geopandas
+shapely
+pandas
+plotly
+networkx
+requests
+branca
+textwrap3
