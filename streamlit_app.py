@@ -8,7 +8,7 @@ from shapely.geometry import Point
 import pandas as pd
 import plotly.express as px
 import networkx as nx
-#import xlrd
+import xlrd
 #from folium import GeoJson, GeoJsonTooltip
 
 import requests
