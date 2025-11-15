@@ -448,6 +448,7 @@ with tab_map:
                 
                 
                 folium.LayerControl().add_to(m)
+                st.write("App started at:", time.time())
                 st_folium(m,use_container_width=True)
                 
                 # col1,col2 = st.columns(2, gap="small", border=True)    
