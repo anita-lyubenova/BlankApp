@@ -256,6 +256,8 @@ with tab_map:
                     ).add_to(m)
                  
                 st.session_state.map = m 
+    if st.session_state.map:
+        st_folium(st.session_state.map, width=700, height=500)
                 # if no_landuse_input:
                 #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
                 #     #transform to long format
@@ -457,8 +459,7 @@ with tab_map:
                 
                 folium.LayerControl().add_to(m)
                 
-                if st.session_state.map:
-                    st_folium(st.session_state.map, width=700, height=500)
+                
                 
                 # col1,col2 = st.columns(2, gap="small", border=True)    
                 
