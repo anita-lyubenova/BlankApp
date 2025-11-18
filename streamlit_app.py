@@ -77,6 +77,62 @@ def melt_tags(gdf, tag_keys):
     melted = gpd.GeoDataFrame(melted, geometry="geometry", crs=gdf.crs)
     return melted
 
+
+def process_elevations(location, radius):
+    """
+    Fetches elevation data and computes edge grades for a walking network around a given point.
+
+    Args:
+        location (tuple): (latitude, longitude) of the center point.
+        radius (float): Distance in meters for fetching the street network.
+
+    Returns:
+        nodes (GeoDataFrame): Node data with elevation.
+        edges (GeoDataFrame): Edge data with absolute grade.
+    """
+    
+    # 1. Retrieve street network
+    G = ox.graph_from_point(location, dist=radius, network_type='walk')
+    
+    # 2. Extract nodes
+    nodes, _ = ox.graph_to_gdfs(G)
+    
+    # 3. Prepare node coordinates and batching
+    coords = list(zip(nodes.y, nodes.x))
+    batch_size = 100
+    elevations = []
+    #total_batches = (len(coords) + batch_size - 1) // batch_size
+
+    # 4. Fetch elevations in batches
+    for i in range(0, len(coords), batch_size):
+        batch = coords[i:i+batch_size]
+        locations = "|".join([f"{lat},{lon}" for lat, lon in batch])
+        url = f"https://api.opentopodata.org/v1/srtm90m?locations={locations}"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            results = response.json().get('results', [])
+            elevations.extend([res.get('elevation', None) for res in results])
+        else:
+            elevations.extend([None] * len(batch))
+        
+        time.sleep(1)  # API rate limiting
+    
+    # 5. Append elevation data
+    nodes['elevation'] = pd.to_numeric(elevations, errors='coerce')
+    median_elevation = nodes['elevation'].median()
+    nodes['elevation'].fillna(median_elevation, inplace=True)
+
+    # 6. Push elevations back to graph
+    for node_id, elev in zip(nodes.index, nodes['elevation']):
+        G.nodes[node_id]['elevation'] = elev
+
+    # 7. Compute edge grades
+    G = ox.add_edge_grades(G, add_absolute=True)
+    _, edges = ox.graph_to_gdfs(G)
+
+    return nodes, edges
+
 def click_button():
     st.session_state.clicked = True    
 #get pie index 
@@ -115,6 +171,10 @@ if "map" not in st.session_state:
     st.session_state.map = None
 if 'clicked' not in st.session_state:
     st.session_state.clicked = False
+if 'nodes' not in st.session_state:
+    st.session_state.nodes = None
+if 'edges' not in st.session_state:
+    st.session_state.edges = None
 
 
 #Built environment feautres for the pie chart
@@ -264,58 +324,8 @@ with tab_map:
             #st.session_state.map = m 
             
             # Elevation data ----------------------------------------------------------------------------------------
-            # 1. Get the street network (nodes + edges)
-            G = ox.graph_from_point(st.session_state.location, dist=st.session_state.POI_radius, network_type='walk')
-            
-            # 2. Extract nodes only
-            nodes, edges = ox.graph_to_gdfs(G)
-            
-            # # 3. Prepare node coordinates
-            coords = list(zip(nodes.y, nodes.x))
-            batch_size = 100  # OpenTopoData can only take limited locations per request
-            batches = [coords[i:i+batch_size] for i in range(0, len(coords), batch_size)]
-            elevations = []
-            
-            progress_text = "Fetching elevation data..."
-            progress_elevation= st.progress(0, text=progress_text)
-            total_batches = (len(coords) + batch_size - 1) // batch_size  # ceil division
-            
-            # 4. Query the OpenTopoData API in batches
-            for i in range(0, len(coords), batch_size):
-                batch = coords[i:i+batch_size]
-                locations = "|".join([f"{lat},{lon}" for lat, lon in batch])
-                url = f"https://api.opentopodata.org/v1/srtm90m?locations={locations}"
-                r = requests.get(url)
-                if r.status_code == 200:
-                    results = r.json().get('results', [])
-                    elevations.extend([r.get('elevation', None) for r in results])
-                else:
-                    elevations.extend([None]*len(batch))
-                time.sleep(1)  # avoid rate limit
-                progress_pct = int((i+1)/total_batches ) #int(((i+1)/total_batches) * 100)
-                progress_elevation.progress(progress_pct, text=f"{progress_text} ({progress_pct}%)")
-                
-            progress_elevation.empty()
-            
-            
-            # 5. Add node elevations
-            nodes["elevation"] = elevations
-            
-            # Replace None or NaN with median (fallback)
-            nodes["elevation"] = pd.to_numeric(nodes["elevation"], errors="coerce")
-            median_elev = nodes["elevation"].median()
-            nodes["elevation"].fillna(median_elev, inplace=True)
-            
-            # 5. Push node elevations back to the graph
-            for node_id, elev in zip(nodes.index, nodes["elevation"]):
-                G.nodes[node_id]["elevation"] = elev
-            
-            # 6. Compute edge grades (uses node elevations)
-            G = ox.add_edge_grades(G, add_absolute=True)
-            edges = ox.graph_to_gdfs(G, nodes=False)
-            grades = edges['grade_abs'].dropna()  # remove any NaN 
+            st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
 
-            #m_elev = folium.Map(location=[lat, lon], zoom_start=14) 
             elevation_layer = folium.FeatureGroup(name="Street steepness")
             
             max_grade = 0.15 #edges['grade_abs'].max()
@@ -323,7 +333,7 @@ with tab_map:
             colormap.caption = 'Street Grade (%)'
             
             # 10. Add edges as polylines with color based on grade
-            for _, row in edges.iterrows():
+            for _, row in st.session_state.edges.iterrows():
                 coords = [(y, x) for x, y in row.geometry.coords]
                 color = colormap(row['grade_abs'])
                 folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(elevation_layer)
