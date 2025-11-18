@@ -266,8 +266,9 @@ with tab_map:
             
     if st.session_state.location:
         st.write(st.session_state.location)
-    if st.session_state.map:
         st_folium(st.session_state.map, width=700, height=500)
+    #if st.session_state.map:
+        
 
                 # if no_landuse_input:
                 #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
