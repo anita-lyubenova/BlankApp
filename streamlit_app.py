@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.express as px
 import networkx as nx
 import xlrd
+from streamlit_folium import folium_static
 
 #from folium import GeoJson, GeoJsonTooltip
 
@@ -133,9 +134,28 @@ def process_elevations(location, radius):
     
     G = ox.add_edge_grades(G, add_absolute=True)
     edges = ox.graph_to_gdfs(G, nodes=False)
-    grades = edges['grade_abs'].dropna()
+    #grades = edges['grade_abs'].dropna()
 
     return nodes, edges
+
+
+def create_map():
+    if 'map' not in st.session_state or st.session_state.map is None:
+        m = folium.Map(location=[59.3327, 18.0656], zoom_start=12)
+        folium.Circle(
+            location=st.session_state.location,
+            radius=st.session_state.POI_radius,  # in meters
+            color='black',       
+            fill=False,
+            weight=2.5            
+            ).add_to(m)
+
+        st.session_state.map = m  # Save the map in the session state
+    return st.session_state.map
+
+def show_map():
+    m = create_map()  # Get or create the map
+    folium_static(m)
 
 def click_button():
     st.session_state.clicked = True    
@@ -171,8 +191,8 @@ st.write("App started at:", time.time())
 # Initialize session state variables if they don't exist
 if "location" not in st.session_state:
     st.session_state.location = None
-if "map" not in st.session_state:
-    st.session_state.map = None
+# if "map" not in st.session_state:
+#     st.session_state.map = None
 if 'clicked' not in st.session_state:
     st.session_state.clicked = False
 if 'nodes' not in st.session_state:
@@ -527,7 +547,8 @@ with tab_map:
                 
     if st.session_state.location:
            st.write(st.session_state.location)
-           st_folium(st.session_state.map, width=700, height=500)             
+           #st_folium(st.session_state.map, width=700, height=500) 
+           show_map()            
     
     
             # else:
