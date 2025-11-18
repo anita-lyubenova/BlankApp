@@ -183,6 +183,11 @@ if "location" not in st.session_state:
     st.session_state.location = None
 if "map" not in st.session_state:
     st.session_state.map = None
+if 'clicked' not in st.session_state:
+    st.session_state.clicked = False
+
+def click_button():
+    st.session_state.clicked = True    
 #Built environment feautres for the pie chart
 tags0 = {
     'landuse': True,   # True → all landuse values
@@ -227,15 +232,10 @@ with tab_map:
         poi_tags=ms_index[ms_index['Multiselect'].isin(selected_poi)][["key", "value"]].groupby("key")["value"].apply(list).to_dict()
     
     
-    if st.session_state.location:
-        st.write(st.session_state.location)
-    if st.session_state.map:
-        st_folium(st.session_state.map, width=700, height=500)
-    
-    go_input = st.button("Go!", key="go_btn")
+    go_input = st.button("Go!", on_click=click_button)
     st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
-    if st.session_state.go_btn:
+    if st.session_state.clicked:
         
         if st.session_state.address:
             
@@ -259,8 +259,15 @@ with tab_map:
                 ).add_to(m)
              
             st.session_state.map = m 
+            
+
         else:
             st.error("Address not found!")
+            
+    if st.session_state.location:
+        st.write(st.session_state.location)
+    if st.session_state.map:
+        st_folium(st.session_state.map, width=700, height=500)
 
                 # if no_landuse_input:
                 #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
