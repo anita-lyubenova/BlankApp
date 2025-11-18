@@ -265,11 +265,10 @@ with tab_map:
             
             # Elevation data ----------------------------------------------------------------------------------------
             # 1. Get the street network (nodes + edges)
-            G = ox.graph_from_point((lat, lon), dist=POI_radius, network_type='walk')
+            G = ox.graph_from_point(st.session_state.location, dist=st.session_state.POI_radius, network_type='walk')
             
             # 2. Extract nodes only
             nodes, edges = ox.graph_to_gdfs(G)
-            
             
             # # 3. Prepare node coordinates
             coords = list(zip(nodes.y, nodes.x))
