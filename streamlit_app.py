@@ -128,8 +128,12 @@ def process_elevations(location, radius):
         G.nodes[node_id]['elevation'] = elev
 
     # 7. Compute edge grades
+    # G = ox.add_edge_grades(G, add_absolute=True)
+    # _, edges = ox.graph_to_gdfs(G)
+    
     G = ox.add_edge_grades(G, add_absolute=True)
-    _, edges = ox.graph_to_gdfs(G)
+    edges = ox.graph_to_gdfs(G, nodes=False)
+    grades = edges['grade_abs'].dropna()
 
     return nodes, edges
 
