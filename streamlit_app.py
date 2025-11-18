@@ -232,10 +232,10 @@ with tab_map:
     if st.session_state.map:
         st_folium(st.session_state.map, width=700, height=500)
     
-    go_input = st.button("Go!")
+    go_input = st.button("Go!", key="go_btn")
     st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
-    if go_input:
+    if st.session_state.go_btn:
         
         if st.session_state.address:
             
