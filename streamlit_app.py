@@ -77,6 +77,8 @@ def melt_tags(gdf, tag_keys):
     melted = gpd.GeoDataFrame(melted, geometry="geometry", crs=gdf.crs)
     return melted
 
+def click_button():
+    st.session_state.clicked = True    
 #get pie index 
 pie_index = load_pie_index("pie_index")
 
@@ -106,15 +108,32 @@ st.set_page_config(page_title=apptitle,
 st.title("Relocation Navigator")
 st.write("App started at:", time.time())
 
+# Initialize session state variables if they don't exist
+if "location" not in st.session_state:
+    st.session_state.location = None
+if "map" not in st.session_state:
+    st.session_state.map = None
+if 'clicked' not in st.session_state:
+    st.session_state.clicked = False
 
 
+#Built environment feautres for the pie chart
+tags0 = {
+    'landuse': True,   # True → all landuse values
+    'natural': True,   # all natural features
+    'leisure': True,    # all leisure features
+    'amenity':True,
+   # 'shop':True,
+    'building': True,
+}
 
+
+ # /* No padding */
+ # div[data-testid = 'stMainBlockContainer']{padding: 0rem 0rem 0rem 1rem;} 
 st.markdown(
     """
     <style>
-    /* No padding */
-    div[data-testid = 'stMainBlockContainer']{padding: 0rem 0rem 0rem 1rem;} 
-    
+   
    
     div.stButtonGroup {
         display: flex !important;       /* set label to be on the same line as buttons */
@@ -146,6 +165,7 @@ st.markdown(
 intro_text = " Relocation Navigator helps you explore neighborhoods by providing and visualizing information about the local streets, land use, and nearby points of interest. Home seekers, cyclists and pedestrians can get an overview of an unknown neighborhood to inform relocation or travel decisions.Open Street Map data is used to visualize land use patterns and to find amenities like schools, public transport, shops, leisure spots, etc. The app shows walking distances to selected points of interest. Street steepness and shortest distance to key amenities can indicate level of accessibility. "
  
 tab_intro, tab_map = st.tabs(["Introduction", "Explore"])
+
 with tab_intro:
     #st.markdown(textwrap.fill(text=intro_text, width=50),unsafe_allow_html=True)
     st.markdown("""
@@ -178,25 +198,7 @@ with tab_intro:
     - Markers for selected points of interest  
     """)
     
-   # Initialize session state variables if they don't exist
-if "location" not in st.session_state:
-    st.session_state.location = None
-if "map" not in st.session_state:
-    st.session_state.map = None
-if 'clicked' not in st.session_state:
-    st.session_state.clicked = False
 
-def click_button():
-    st.session_state.clicked = True    
-#Built environment feautres for the pie chart
-tags0 = {
-    'landuse': True,   # True → all landuse values
-    'natural': True,   # all natural features
-    'leisure': True,    # all leisure features
-    'amenity':True,
-   # 'shop':True,
-    'building': True,
-}
 # Main --------------------------------------------------------
 
 with tab_map:
@@ -233,32 +235,33 @@ with tab_map:
     
     
     go_input = st.button("Go!", on_click=click_button)
+    
     st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
     if st.session_state.clicked:
         
         if st.session_state.address:
             
-            location = geocode_address(st.session_state.address)
+            st.session_state.location = geocode_address(st.session_state.address)
         
-            lat, lon = location
-            st.session_state.location = location  # Save coordinates in session_state
-            st.write(f"Coordinates: {lat}, {lon}")
+            #lat, lon = location
+           # st.session_state.location = location  # Save coordinates in session_state
+            #st.write(f"Coordinates: {lat}, {lon}")
             
             #Map --------------------------------------------------------------
             
-            m = folium.Map(location=[lat, lon], zoom_start=14)         
+            st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
             # Add address marker
-            folium.Marker([lat, lon], popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(m)
+            folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
             folium.Circle(
-                location=[lat, lon],
+                location=st.session_state.location,
                 radius=st.session_state.POI_radius,  # in meters
                 color='black',       
                 fill=False,
                 weight=2.5            
-                ).add_to(m)
+                ).add_to(st.session_state.map)
              
-            st.session_state.map = m 
+            #st.session_state.map = m 
             
 
         else:
@@ -267,7 +270,7 @@ with tab_map:
     if st.session_state.location:
         st.write(st.session_state.location)
         st_folium(st.session_state.map, width=700, height=500)
-    #if st.session_state.map:
+    
         
 
                 # if no_landuse_input:
