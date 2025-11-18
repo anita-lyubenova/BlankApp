@@ -333,7 +333,7 @@ with tab_map:
             elevation_layer = folium.FeatureGroup(name="Street steepness")
             
             max_grade = 0.15 #edges['grade_abs'].max()
-            colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=max_grade)
+            colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
             colormap.caption = 'Street Grade (%)'
             
             # 10. Add edges as polylines with color based on grade
