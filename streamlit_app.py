@@ -147,7 +147,7 @@ def click_button():
 def get_landuse_data(location, radius, tags):
 
     #all_features = get_osm_features(lat, lon, tags0, POI_radius)
-    all_features = ox.features_from_point(location, tags=tags, dist=radius)
+    all_features = ox.features_from_point(center_point=location, tags=tags, dist=radius)
     #transform to long format
     all_features=melt_tags(all_features, tags.keys())
     
@@ -393,11 +393,14 @@ with tab_map:
                 colormap.add_to(st.session_state.map)
                 elevation_layer.add_to(st.session_state.map)
                 
+                
+                 #pie chart----------------------------------------------------
                 st.write("Get and process land use data")
+                
                 st.session_state.landuse_data = get_landuse_data(location = st.session_state.location,
                                                                  radius = st.session_state.POI_radius,
                                                                  tags = tags0)
-                #pie chart----------------------------------------------------
+              
                 st.session_state.piechart = px.pie(
                     aggregate_landuse_data(st.session_state.landuse_data),
                     names="pie_cat",
