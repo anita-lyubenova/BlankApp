@@ -36,8 +36,8 @@ def geocode_address(address):
     return lat, lon
 
 @st.cache_data(show_spinner=True, show_time = True)
-def get_osm_features(location, tags, dist):
-    return ox.features_from_point(location, tags=tags, dist=dist)
+# def get_osm_features(location, tags, dist):
+#     return ox.features_from_point(location, tags=tags, dist=dist)
 
 @st.cache_data
 def load_pie_index(sheet):
@@ -179,6 +179,14 @@ def aggregate_landuse_data(landuse_data):
     pie_data["values_included"] = (pie_data["values_included"].str.replace("_", " ")) #remove underscores from the column (for the popup)
     
     return pie_data
+
+def get_POIs(location, radius, poi_tags):
+    ms_poi = ox.features_from_point(center_point=location, tags=poi_tags, dist=radius)
+    poi_data = melt_tags(ms_poi, poi_tags.keys()).reset_index().merge(ms_poi.reset_index()[["id", "name"]], on="id").merge(ms_index[["Category", "Multiselect", "key", "value", "color", "icon"]], on=["key", "value"])
+    poi_data.loc[poi_data['name'].isna(), 'name']="Unnamed"
+    
+    return poi_data
+
 # def show_pie_chart():
 #     st.plotly_chart(st.session_state.piechart,
 #                     use_container_width=True,
@@ -231,7 +239,11 @@ if 'map' not in st.session_state:
     st.session_state.map = None
 if 'piechart' not in st.session_state:
     st.session_state.piechart = None
-    
+if 'poi_data' not in st.session_state:
+    st.session_state.poi_data = None
+if 'poi_tags' not in st.session_state:
+    st.session_state.poi_tags = None
+               
     
 #Built environment feautres for the pie chart
 tags0 = {
@@ -347,7 +359,7 @@ with tab_map:
             selected_poi.extend(selected)
             
     if selected_poi:
-        poi_tags=ms_index[ms_index['Multiselect'].isin(selected_poi)][["key", "value"]].groupby("key")["value"].apply(list).to_dict()
+        st.session_state.poi_tags=ms_index[ms_index['Multiselect'].isin(selected_poi)][["key", "value"]].groupby("key")["value"].apply(list).to_dict()
     
     
     go_input = st.button("Go!", on_click=click_button)
@@ -444,8 +456,10 @@ with tab_map:
            
           
             
-            # Elevation data ----------------------------------------------------------------------------------------
-           
+            # POI map layer ----------------------------------------------------------------------------------------
+            st.session_state.poi_data = get_POIs(location = st.session_state.location,
+                                                 radius = st.session_state.POI_radius,
+                                                 poi_tags = st.session_state.poi_tags)
             
             
             
@@ -634,10 +648,9 @@ with tab_map:
     if st.session_state.location:
         with col1:
            st.subheader("Map")
-           st.write("Here you can see land use patterns, street steepness, and where your points of interest are located")
+           st.write("Here you can see land use patterns, street steepness, and where your points of interest are located. The area colors correspond to the pie chart categories.")
            #st.write(st.session_state.location)
-           #st_folium(st.session_state.map, width=700, height=500) 
-           show_map()  
+           #st_folium(st.session_state.map, width=700, height=500)
            with st.popover("Steepness reference values"):
                 st.markdown("""
                     - **0–2%**: Very flat street, easy to walk or bike  
@@ -647,13 +660,16 @@ with tab_map:
                     - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
                 
                     """)
+           show_map()  
+           
         with col2:
-            
+            st.write("Here you can see land use distribution across different categories. If you want to remove a category from the pie chart, click on it in the legend.")
             st.plotly_chart(st.session_state.piechart,
                            use_container_width=True,
                            key="landuse_pie",
                            config = {'height': fig_height})
     
-    
+    if st.session_state.poi_tags:
+        st.session_state.poi_data
             # else:
             #     st.error("Address not found!")
