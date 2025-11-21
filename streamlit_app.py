@@ -213,37 +213,37 @@ tags0 = {
 
  # /* No padding */
  # div[data-testid = 'stMainBlockContainer']{padding: 0rem 0rem 0rem 1rem;} 
-# st.markdown(
-#     """
-#     <style>
+st.markdown(
+    """
+    <style>
    
    
-#     div.stButtonGroup {
-#         display: flex !important;       /* set label to be on the same line as buttons */
-#         align-items: top;            /* vertical align label and pills */
-#         gap: 10px;                      /* space between label and buttons */
-#     }
+    div.stButtonGroup {
+        display: flex !important;       /* set label to be on the same line as buttons */
+        align-items: top;            /* vertical align label and pills */
+        gap: 10px;                      /* space between label and buttons */
+    }
     
-#     div.stButtonGroup label {
-#         white-space: nowrap !important; /* prevent label from breaking */
-#         flex-shrink: 0;                 /* don’t allow the label to shrink */
-#         margin-bottom: 0 !important;
-#     }
+    div.stButtonGroup label {
+        white-space: nowrap !important; /* prevent label from breaking */
+        flex-shrink: 0;                 /* don’t allow the label to shrink */
+        margin-bottom: 0 !important;
+    }
     
-#     div.stButtonGroup label div[data-testid='stMarkdownContainer'] p {
-#         font-weight: bold !important;
-#         margin: 0;  /* optional: remove default margin */
-#     }
-#     /* Add left margin to the tabs */
-#     div[data-baseweb="tab-list"] {margin-left: 50px !important;}
+    div.stButtonGroup label div[data-testid='stMarkdownContainer'] p {
+        font-weight: bold !important;
+        margin: 0;  /* optional: remove default margin */
+    }
+    /* Add left margin to the tabs */
+    /* div[data-baseweb="tab-list"] {margin-left: 50px !important;}*/
     
-#     /* Add left padding to the tab content panels */
-#         div[data-baseweb="tab-panel"] { padding-left: 50px !important;}
+    /* Add left padding to the tab content panels */
+    */    div[data-baseweb="tab-panel"] { padding-left: 50px !important;}*/
     
-#     </style>
-#     """,
-#     unsafe_allow_html=True
-# )
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 intro_text = " Relocation Navigator helps you explore neighborhoods by providing and visualizing information about the local streets, land use, and nearby points of interest. Home seekers, cyclists and pedestrians can get an overview of an unknown neighborhood to inform relocation or travel decisions.Open Street Map data is used to visualize land use patterns and to find amenities like schools, public transport, shops, leisure spots, etc. The app shows walking distances to selected points of interest. Street steepness and shortest distance to key amenities can indicate level of accessibility. "
  
