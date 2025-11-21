@@ -141,8 +141,8 @@ def process_elevations(location, radius):
 def show_map():
     folium_static(st.session_state.map)
 
-def click_button():
-    st.session_state.clicked = True
+# def click_button():
+#     st.session_state.clicked = True
     
 def get_landuse_data(location, radius, tags):
 
@@ -299,6 +299,11 @@ tags0 = {
 
  # /* No padding */
  # div[data-testid = 'stMainBlockContainer']{padding: 0rem 0rem 0rem 1rem;} 
+   # /* Add left margin to the tabs */
+   # /* div[data-baseweb="tab-list"] {margin-left: 50px !important;}*/
+   
+   # /* Add left padding to the tab content panels */
+   # */    div[data-baseweb="tab-panel"] { padding-left: 50px !important;}*/
 st.markdown(
     """
     <style>
@@ -320,11 +325,14 @@ st.markdown(
         font-weight: bold !important;
         margin: 0;  /* optional: remove default margin */
     }
-    /* Add left margin to the tabs */
-    /* div[data-baseweb="tab-list"] {margin-left: 50px !important;}*/
-    
-    /* Add left padding to the tab content panels */
-    */    div[data-baseweb="tab-panel"] { padding-left: 50px !important;}*/
+     /* App title in header bar */
+    header:before {
+        content: 'Relocation Navigator';
+        font-size: 18px;
+        font-weight: 600;
+        margin-right: 20px;
+        color: #333;
+    }
     
     </style>
     """,
@@ -404,7 +412,6 @@ with tab_map:
     
     
     # go_input = st.button("Go!", on_click=click_button)
-    
     #st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
     if st.button("Go!"): #st.session_state.clicked:
