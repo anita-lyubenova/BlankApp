@@ -403,11 +403,11 @@ with tab_map:
         st.session_state.poi_tags=ms_index[ms_index['Multiselect'].isin(selected_poi)][["key", "value"]].groupby("key")["value"].apply(list).to_dict()
     
     
-    go_input = st.button("Go!", on_click=click_button)
+    # go_input = st.button("Go!", on_click=click_button)
     
-    st.write("Button value:", go_input)
+    #st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
-    if st.session_state.clicked:
+    if st.button("Go!"): #st.session_state.clicked:
         if st.session_state.address:
             with st.status("Processing, please wait...", expanded=True) as status:
                 
