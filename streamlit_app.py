@@ -457,9 +457,11 @@ with tab_map:
           
             
             # POI map layer ----------------------------------------------------------------------------------------
-            st.session_state.poi_data = get_POIs(location = st.session_state.location,
-                                                 radius = st.session_state.POI_radius,
-                                                 poi_tags = st.session_state.poi_tags)
+            if selected_poi:
+                st.write("Get points of interest")
+                st.session_state.poi_data = get_POIs(location = st.session_state.location,
+                                                     radius = st.session_state.POI_radius,
+                                                     poi_tags = st.session_state.poi_tags)
             
             
             
@@ -669,7 +671,7 @@ with tab_map:
                            key="landuse_pie",
                            config = {'height': fig_height})
     
-    if st.session_state.poi_tags:
+    if selected_poi::
         st.session_state.poi_data
             # else:
             #     st.error("Address not found!")
