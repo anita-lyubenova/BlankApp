@@ -617,13 +617,27 @@ with tab_map:
                 #         st.info("No landuse characteristics were obtained. If you want to see the landuse distribution, mark the checkbox")
                    
                     
-               
+    col1,col2 = st.columns(2, gap="small", border=True)             
                 
     if st.session_state.location:
-           st.write(st.session_state.location)
+        with col1:
+           st.subheader("Map")
+           st.write("Here you can see land use patterns, elevation profile and where your points of interest are located")
+           #st.write(st.session_state.location)
            #st_folium(st.session_state.map, width=700, height=500) 
            show_map()  
-           st.plotly_chart(st.session_state.piechart,
+           with st.popover("Steepness reference values"):
+                st.markdown("""
+                    - **0–2%**: Very flat street, easy to walk or bike  
+                    - **2–5%**: Slight incline, barely noticeable  
+                    - **5–8%**: Moderate slope, noticeable uphill effort  
+                    - **8–12%**: Steep street, challenging for bikes or long walks  
+                    - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
+                
+                    """)
+        with col2:
+            
+            st.plotly_chart(st.session_state.piechart,
                            use_container_width=True,
                            key="landuse_pie",
                            config = {'height': fig_height})
