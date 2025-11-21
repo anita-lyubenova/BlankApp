@@ -258,8 +258,8 @@ st.set_page_config(page_title=apptitle,
                    layout="wide",
                    initial_sidebar_state="collapsed")
 
-st.title("Relocation Navigator")
-st.write("App started at:", time.time())
+# st.title("Relocation Navigator")
+# st.write("App started at:", time.time())
 
 # Initialize session state variables if they don't exist
 if "location" not in st.session_state:
@@ -328,7 +328,7 @@ st.markdown(
      /* App title in header bar */
     header:before {
         content: 'Relocation Navigator';
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 600;
         margin-right: 20px;
         margin-left: 20px;
