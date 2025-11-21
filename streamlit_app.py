@@ -187,6 +187,44 @@ def get_POIs(location, radius, poi_tags):
     
     return poi_data
 
+def available_POIs(location, radius, poi_data):
+        G = ox.graph_from_point(location, dist=radius, network_type='walk')
+        home_node = ox.nearest_nodes(G, lon=location[1], lat=location[0])
+        
+        #change crs to compute centroids of the polygons
+        p3857 = poi_data.to_crs(epsg=3857) 
+        p3857['centroide'] = p3857.geometry.centroid
+        p3857=p3857.set_geometry("centroide")
+
+        p4326=p3857.to_crs(epsg=4326)
+
+        results = []
+        
+        for cat in selected_poi:
+           
+            filtered = p4326[p4326["Multiselect"] == cat]
+            if filtered.empty:
+                results.append({"Category": cat, "Present": "No", "Name of nearest": None, "Distance to nearest (m)": None})
+                continue
+        
+            # map each POI geometry to nearest node
+            filtered = filtered.copy()
+           
+            filtered["node"] = filtered.geometry.apply(lambda geom: ox.nearest_nodes(G, geom.x, geom.y))
+            # compute walk distance for each
+            filtered["walk_dist_m"] = filtered["node"].apply( lambda target_node: nx.shortest_path_length(G, home_node, target_node, weight='length'))
+            
+            # pick nearest by walking
+            nearest = filtered.to_crs(epsg=4326).loc[filtered["walk_dist_m"].idxmin()]
+            
+            results.append({"Point of interest": cat,
+                            "Present": "Yes",
+                            "Name of nearest": nearest["name"],
+                            "Distance to nearest (m)": round(nearest["walk_dist_m"])
+                           })
+        results_df=pd.DataFrame(results)
+        return results_df
+    
 # def show_pie_chart():
 #     st.plotly_chart(st.session_state.piechart,
 #                     use_container_width=True,
@@ -243,7 +281,9 @@ if 'poi_data' not in st.session_state:
     st.session_state.poi_data = None
 if 'poi_tags' not in st.session_state:
     st.session_state.poi_tags = None
-               
+if 'nearest_poi' not in st.session_state:
+    st.session_state.nearest_poi = None
+                 
     
 #Built environment feautres for the pie chart
 tags0 = {
@@ -456,7 +496,7 @@ with tab_map:
            
           
             
-            # POI map layer ----------------------------------------------------------------------------------------
+                # POI map layer ----------------------------------------------------------------------------------------
                 if selected_poi:
                     st.write("Get points of interest")
                     st.session_state.poi_data = get_POIs(location = st.session_state.location,
@@ -479,9 +519,14 @@ with tab_map:
                              
                     poi_layer.add_to(st.session_state.map)
             
-            
+                    #Available PoI: ---------------------------------------------------------------------------------
+                    st.session_state.nearest_poi =available_POIs(location = st.session_state.location,
+                                                               radius = st.session_state.POI_radius,
+                                                               poi_data = st.session_state.poi_data)    
             
             folium.LayerControl().add_to(st.session_state.map)
+            
+            
 
         else:
             st.error("Address not found!")
@@ -677,7 +722,8 @@ with tab_map:
                     - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
                 
                     """)
-           show_map()  
+           show_map()
+           st.write(st.session_state.nearest_poi)
            
         with col2:
             st.subheader("Land use distribution")
