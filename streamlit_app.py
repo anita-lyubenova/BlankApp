@@ -462,7 +462,22 @@ with tab_map:
                 st.session_state.poi_data = get_POIs(location = st.session_state.location,
                                                      radius = st.session_state.POI_radius,
                                                      poi_tags = st.session_state.poi_tags)
-            
+                poi_layer = folium.FeatureGroup(name="Points of Interest")
+                    
+                for idx, row in st.session_state.poi_data.iterrows():
+                    lon_, lat_ = row.geometry.centroid.xy
+                    folium.Marker(
+                        location=[lat_[0], lon_[0]],
+                        popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get('Category','N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
+                        icon=folium.Icon(
+                            color=row['color'],
+                            icon=row['icon'].replace("fa-", "") if str(row['icon']).startswith("fa-") else row['icon'],
+                            prefix="fa" if str(row['icon']).startswith("fa-") else None
+                        )
+                        
+                        ).add_to(poi_layer)
+                         
+                poi_layer.add_to(st.session_state.map)
             
             
             
@@ -665,6 +680,7 @@ with tab_map:
            show_map()  
            
         with col2:
+            st.subheader("Land use distribution")
             st.write("Here you can see land use distribution across different categories. If you want to remove a category from the pie chart, click on it in the legend.")
             st.plotly_chart(st.session_state.piechart,
                            use_container_width=True,
