@@ -337,7 +337,7 @@ st.markdown(
     }
     
     header {
-    background-color: #1E90FF !important;  /* your color */
+    background-color: #c3cee3 !important;  /* your color */
     height: 3.5rem !important;             /* adjust height if needed */
 }
     header .stAppToolbar {
