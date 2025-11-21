@@ -36,8 +36,8 @@ def geocode_address(address):
     return lat, lon
 
 @st.cache_data(show_spinner=True, show_time = True)
-def get_osm_features(lat, lon, tags, dist):
-    return ox.features_from_point((lat, lon), tags=tags, dist=dist)
+def get_osm_features(location, tags, dist):
+    return ox.features_from_point(location, tags=tags, dist=dist)
 
 @st.cache_data
 def load_pie_index(sheet):
@@ -49,12 +49,12 @@ def load_pie_index(sheet):
 
 
 
-def clip_to_circle(gdf, lat, lon, radius):
+def clip_to_circle(gdf, location, radius):
     if gdf.crs is None:
         gdf = gdf.set_crs(4326)
     proj_crs = gdf.estimate_utm_crs()
     gdf_proj = gdf.to_crs(proj_crs)
-    center = Point(lon, lat)
+    center = Point(location)
     circle = gpd.GeoSeries([center], crs=4326).to_crs(proj_crs).buffer(radius)
     return gpd.clip(gdf_proj, circle).to_crs(4326)
 
@@ -144,6 +144,46 @@ def show_map():
 def click_button():
     st.session_state.clicked = True
     
+def get_landuse_data(location, radius, tags):
+
+    #all_features = get_osm_features(lat, lon, tags0, POI_radius)
+    all_features = ox.features_from_point(location, tags=tags, dist=radius)
+    #transform to long format
+    all_features=melt_tags(all_features, tags.keys())
+    
+    # Pie chart data ------------------------------------------------------------------------------------------------------
+    # get only polygons
+    polygon_features = all_features[all_features.geometry.geom_type.isin(["Polygon", "MultiPolygon"])]
+    
+    clipped=clip_to_circle(gdf=polygon_features, location=location, radius=radius)
+    
+    #Copmute square meter area per key and value-----------------------
+    # Project to metric CRS for accurate areas
+    proj_crs = clipped.estimate_utm_crs()
+    clipped = clipped.to_crs(proj_crs)
+    clipped["area_m2"] = clipped.geometry.area
+    
+    pie_data0 = clipped.merge(pie_index, on=["key", "value"], how="left")
+    #pie_data0['pie_cat'] =pie_data0['pie_cat'].fillna('other')
+    pie_data0 =pie_data0[pie_data0['pie_cat'].notna()] #remove polygons that are not in the pie index
+    
+    #sum areas
+   
+    return pie_data0
+
+def aggregate_landuse_data(landuse_data):
+    pie_data = landuse_data.groupby(["pie_cat"]).agg(
+        total_area_m2 = ("area_m2", "sum"),
+        values_included=("value", lambda x: ", ".join(sorted(x.unique())))).reset_index() #concantenate all values within the pie_category
+    
+    pie_data["values_included"] = (pie_data["values_included"].str.replace("_", " ")) #remove underscores from the column (for the popup)
+    
+# def show_pie_chart():
+#     st.plotly_chart(st.session_state.piechart,
+#                     use_container_width=True,
+#                     key="landuse_pie",
+#                     config = {'height': fig_height})
+    
 #get pie index 
 pie_index = load_pie_index("pie_index")
 
@@ -184,8 +224,14 @@ if 'nodes' not in st.session_state:
     st.session_state.nodes = None
 if 'edges' not in st.session_state:
     st.session_state.edges = None
-
-
+if 'landuse_data' not in st.session_state:
+    st.session_state.landuse_data = None
+if 'map' not in st.session_state:
+    st.session_state.map = None
+if 'piechart' not in st.session_state:
+    st.session_state.piechart = None
+    
+    
 #Built environment feautres for the pie chart
 tags0 = {
     'landuse': True,   # True → all landuse values
@@ -311,10 +357,9 @@ with tab_map:
         if st.session_state.address:
             with st.status("Processing, please wait...", expanded=True) as status:
                 
-                st.write("Geocode address")
+                st.write("Setting up the map")
                 st.session_state.location = geocode_address(st.session_state.address)
                 
-                st.write("Setting up map")
                 st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
                 # Add address marker
                 folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
@@ -344,9 +389,27 @@ with tab_map:
                     color = colormap(row['grade_abs'])
                     folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(elevation_layer)
                 
-                # 11. Add the color scale
+               
                 colormap.add_to(st.session_state.map)
                 elevation_layer.add_to(st.session_state.map)
+                
+                st.write("Get and process land use data")
+                st.session_state.landuse_data = get_landuse_data(location = st.session_state.location,
+                                                                 radius = st.session_state.POI_radius,
+                                                                 tags = tags0)
+                #pie chart----------------------------------------------------
+                st.session_state.piechart = px.pie(
+                    aggregate_landuse_data(st.session_state.landuse_data),
+                    names="pie_cat",
+                    values="total_area_m2",
+                    hover_data=["values_included"],
+                    color='pie_cat',
+                    color_discrete_map=color_lookup,
+                    hole=.5)
+                st.session_state.piechart.update_traces(
+                    textinfo="percent+label",
+                    pull=[0.05]*len(aggregate_landuse_data(st.session_state.landuse_data)),
+                    hovertemplate="<b>%{label}</b><br>%{value:,.0f} m²<br>%{customdata}")
                 
                 status.update(
                     label="Done!", state="complete", expanded=False
@@ -553,7 +616,11 @@ with tab_map:
     if st.session_state.location:
            st.write(st.session_state.location)
            #st_folium(st.session_state.map, width=700, height=500) 
-           show_map()            
+           show_map()  
+           st.plotly_chart(st.session_state.piechart,
+                           use_container_width=True,
+                           key="landuse_pie",
+                           config = {'height': fig_height})
     
     
             # else:
