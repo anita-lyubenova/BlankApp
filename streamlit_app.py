@@ -671,7 +671,7 @@ with tab_map:
                            key="landuse_pie",
                            config = {'height': fig_height})
     
-    if selected_poi::
+    if selected_poi:
         st.session_state.poi_data
             # else:
             #     st.error("Address not found!")
