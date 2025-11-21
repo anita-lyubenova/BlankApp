@@ -184,6 +184,7 @@ def get_POIs(location, radius, poi_tags):
     ms_poi = ox.features_from_point(center_point=location, tags=poi_tags, dist=radius)
     poi_data = melt_tags(ms_poi, poi_tags.keys()).reset_index().merge(ms_poi.reset_index()[["id", "name"]], on="id").merge(ms_index[["Category", "Multiselect", "key", "value", "color", "icon"]], on=["key", "value"])
     poi_data.loc[poi_data['name'].isna(), 'name']="Unnamed"
+    poi_data = poi_data.drop_duplicates(subset=["name", "Multiselect"])
     
     return poi_data
 
