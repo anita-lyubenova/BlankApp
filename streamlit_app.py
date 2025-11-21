@@ -189,7 +189,7 @@ def get_POIs(location, radius, poi_tags):
 
 def available_POIs(location, radius, poi_data):
         G = ox.graph_from_point(location, dist=radius, network_type='walk')
-        home_node = ox.nearest_nodes(G, lon=location[1], lat=location[0])
+        home_node = ox.nearest_nodes(G, X=location[1], Y=location[0])
         
         #change crs to compute centroids of the polygons
         p3857 = poi_data.to_crs(epsg=3857) 
