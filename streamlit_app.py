@@ -332,7 +332,7 @@ st.markdown(
         font-weight: 600;
         margin-right: 20px;
         margin-left: 20px;
-        color: #606061;
+        color: #2d2d2e;
         white-space: nowrap;
     }
     
