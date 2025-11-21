@@ -54,7 +54,7 @@ def clip_to_circle(gdf, location, radius):
         gdf = gdf.set_crs(4326)
     proj_crs = gdf.estimate_utm_crs()
     gdf_proj = gdf.to_crs(proj_crs)
-    center = Point(location)
+    center = Point(location[1], location[0])
     circle = gpd.GeoSeries([center], crs=4326).to_crs(proj_crs).buffer(radius)
     return gpd.clip(gdf_proj, circle).to_crs(4326)
 
