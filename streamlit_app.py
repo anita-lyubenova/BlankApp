@@ -178,6 +178,7 @@ def aggregate_landuse_data(landuse_data):
     
     pie_data["values_included"] = (pie_data["values_included"].str.replace("_", " ")) #remove underscores from the column (for the popup)
     
+    return pie_data
 # def show_pie_chart():
 #     st.plotly_chart(st.session_state.piechart,
 #                     use_container_width=True,
@@ -400,6 +401,8 @@ with tab_map:
                 st.session_state.landuse_data = get_landuse_data(location = st.session_state.location,
                                                                  radius = st.session_state.POI_radius,
                                                                  tags = tags0)
+                
+                
               
                 st.session_state.piechart = px.pie(
                     aggregate_landuse_data(st.session_state.landuse_data),
