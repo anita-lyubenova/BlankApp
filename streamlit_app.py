@@ -138,26 +138,12 @@ def process_elevations(location, radius):
 
     return nodes, edges
 
-
-# def create_map():
-#     if 'map' not in st.session_state or st.session_state.map is None:
-#         m = folium.Map(location=[59.3327, 18.0656], zoom_start=12)
-#         folium.Circle(
-#             location=st.session_state.location,
-#             radius=st.session_state.POI_radius,  # in meters
-#             color='black',       
-#             fill=False,
-#             weight=2.5            
-#             ).add_to(m)
-
-#         st.session_state.map = m  # Save the map in the session state
-#     return st.session_state.map
-
 def show_map():
     folium_static(st.session_state.map)
 
 def click_button():
-    st.session_state.clicked = True    
+    st.session_state.clicked = True
+    
 #get pie index 
 pie_index = load_pie_index("pie_index")
 
@@ -291,7 +277,7 @@ with tab_map:
         st.text_input("Enter an address:", value ="Skaldevägen 60", key="address")
         st.slider('Show PoIs within:', min_value=100, max_value=2000, value=500, key="POI_radius")
         
-        st.checkbox("Show land use distribution (might take more time)", value =True, key = "landuse_input")
+        #st.checkbox("Show land use distribution (might take more time)", value =True, key = "landuse_input")
     
     with col_features:
         st.write("Select points of interest you'd like to have in the area")
@@ -322,48 +308,65 @@ with tab_map:
     st.write("Button value:", go_input)
     # If user enters an address => find latitude and longitude
     if st.session_state.clicked:
-        
         if st.session_state.address:
+            with st.status("Processing, please wait...", expanded=True) as status:
+                
+                st.write("Geocode address")
+                st.session_state.location = geocode_address(st.session_state.address)
+                
+                st.write("Setting up map")
+                st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
+                # Add address marker
+                folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
+                folium.Circle(
+                    location=st.session_state.location,
+                    radius=st.session_state.POI_radius,  # in meters
+                    color='black',       
+                    fill=False,
+                    weight=2.5            
+                    ).add_to(st.session_state.map)
+                 
             
-            st.session_state.location = geocode_address(st.session_state.address)
+            
+                st.write("Process elevation data")
+                
+                st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
+
+                elevation_layer = folium.FeatureGroup(name="Street steepness")
+                
+                max_grade = 0.15 #edges['grade_abs'].max()
+                colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
+                colormap.caption = 'Street grade'
+                
+                #Add edges as polylines with color based on grade
+                for _, row in st.session_state.edges.iterrows():
+                    coords = [(y, x) for x, y in row.geometry.coords]
+                    color = colormap(row['grade_abs'])
+                    folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(elevation_layer)
+                
+                # 11. Add the color scale
+                colormap.add_to(st.session_state.map)
+                elevation_layer.add_to(st.session_state.map)
+                
+                status.update(
+                    label="Done!", state="complete", expanded=False
+                )
+            
         
-            #lat, lon = location
-           # st.session_state.location = location  # Save coordinates in session_state
-            #st.write(f"Coordinates: {lat}, {lon}")
+            
+            
+        
+    
             
             #Map --------------------------------------------------------------
             
-            st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
-            # Add address marker
-            folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
-            folium.Circle(
-                location=st.session_state.location,
-                radius=st.session_state.POI_radius,  # in meters
-                color='black',       
-                fill=False,
-                weight=2.5            
-                ).add_to(st.session_state.map)
-             
+           
             #st.session_state.map = m 
             
             # Elevation data ----------------------------------------------------------------------------------------
-            st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
-
-            elevation_layer = folium.FeatureGroup(name="Street steepness")
+           
             
-            max_grade = 0.15 #edges['grade_abs'].max()
-            colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
-            colormap.caption = 'Street Grade (%)'
             
-            # 10. Add edges as polylines with color based on grade
-            for _, row in st.session_state.edges.iterrows():
-                coords = [(y, x) for x, y in row.geometry.coords]
-                color = colormap(row['grade_abs'])
-                folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(elevation_layer)
-            
-            # 11. Add the color scale
-            colormap.add_to(st.session_state.map)
-            elevation_layer.add_to(st.session_state.map)
             
             
             folium.LayerControl().add_to(st.session_state.map)
