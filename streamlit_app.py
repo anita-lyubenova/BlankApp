@@ -358,6 +358,8 @@ with tab_map:
         if st.session_state.address:
             with st.status("Processing, please wait...", expanded=True) as status:
                 
+                
+                #Base map ---------------------------------------------------------------------
                 st.write("Setting up the map")
                 st.session_state.location = geocode_address(st.session_state.address)
                 
@@ -373,7 +375,7 @@ with tab_map:
                     ).add_to(st.session_state.map)
                  
             
-            
+                # Elevation map layer --------------------------------------------------------
                 st.write("Process elevation data")
                 
                 st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
@@ -395,14 +397,13 @@ with tab_map:
                 elevation_layer.add_to(st.session_state.map)
                 
                 
-                 #pie chart----------------------------------------------------
+                
+                 #pie chart------------------------------------------------------------------------------------
                 st.write("Get and process land use data")
                 
                 st.session_state.landuse_data = get_landuse_data(location = st.session_state.location,
                                                                  radius = st.session_state.POI_radius,
                                                                  tags = tags0)
-                
-                
               
                 st.session_state.piechart = px.pie(
                     aggregate_landuse_data(st.session_state.landuse_data),
@@ -421,16 +422,27 @@ with tab_map:
                     label="Done!", state="complete", expanded=False
                 )
             
-        
             
-            
-        
-    
-            
-            #Map --------------------------------------------------------------
-            
+                #Land use map layed --------------------------------------------------------------
+                landuse_layer = folium.FeatureGroup(name="Land use distribution")
+                    
+                folium.GeoJson(
+                    data=st.session_state.landuse_data,  # All data at once
+                    style_function=lambda feature: {
+                        "fillColor": color_lookup.get(feature["properties"]["pie_cat"]),
+                        "color": "black",
+                        "weight": 0.3,
+                        "fillOpacity": 0.5,
+                    },
+                    popup=folium.GeoJsonPopup(
+                        fields=["pie_cat", "key", "value"],
+                        aliases=["In pie chart", "OSM key", "OSM value"]
+                    )
+                ).add_to(landuse_layer)
+                
+                landuse_layer.add_to(st.session_state.map)
            
-            #st.session_state.map = m 
+          
             
             # Elevation data ----------------------------------------------------------------------------------------
            
@@ -622,7 +634,7 @@ with tab_map:
     if st.session_state.location:
         with col1:
            st.subheader("Map")
-           st.write("Here you can see land use patterns, elevation profile and where your points of interest are located")
+           st.write("Here you can see land use patterns, street steepness, and where your points of interest are located")
            #st.write(st.session_state.location)
            #st_folium(st.session_state.map, width=700, height=500) 
            show_map()  
