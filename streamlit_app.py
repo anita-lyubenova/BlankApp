@@ -334,6 +334,7 @@ st.markdown(
         margin-left: 20px;
         color: #222222;
         white-space: nowrap;
+        background: #c3cee3;
     }
     
     </style>
