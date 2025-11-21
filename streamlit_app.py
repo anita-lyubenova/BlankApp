@@ -331,7 +331,9 @@ st.markdown(
         font-size: 18px;
         font-weight: 600;
         margin-right: 20px;
-        color: #333;
+        margin-left: 20px;
+        color: #222222;
+        white-space: nowrap;
     }
     
     </style>
