@@ -457,27 +457,27 @@ with tab_map:
           
             
             # POI map layer ----------------------------------------------------------------------------------------
-            if selected_poi:
-                st.write("Get points of interest")
-                st.session_state.poi_data = get_POIs(location = st.session_state.location,
-                                                     radius = st.session_state.POI_radius,
-                                                     poi_tags = st.session_state.poi_tags)
-                poi_layer = folium.FeatureGroup(name="Points of Interest")
-                    
-                for idx, row in st.session_state.poi_data.iterrows():
-                    lon_, lat_ = row.geometry.centroid.xy
-                    folium.Marker(
-                        location=[lat_[0], lon_[0]],
-                        popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get('Category','N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
-                        icon=folium.Icon(
-                            color=row['color'],
-                            icon=row['icon'].replace("fa-", "") if str(row['icon']).startswith("fa-") else row['icon'],
-                            prefix="fa" if str(row['icon']).startswith("fa-") else None
-                        )
+                if selected_poi:
+                    st.write("Get points of interest")
+                    st.session_state.poi_data = get_POIs(location = st.session_state.location,
+                                                         radius = st.session_state.POI_radius,
+                                                         poi_tags = st.session_state.poi_tags)
+                    poi_layer = folium.FeatureGroup(name="Points of Interest")
                         
-                        ).add_to(poi_layer)
-                         
-                poi_layer.add_to(st.session_state.map)
+                    for idx, row in st.session_state.poi_data.iterrows():
+                        lon_, lat_ = row.geometry.centroid.xy
+                        folium.Marker(
+                            location=[lat_[0], lon_[0]],
+                            popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get('Category','N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
+                            icon=folium.Icon(
+                                color=row['color'],
+                                icon=row['icon'].replace("fa-", "") if str(row['icon']).startswith("fa-") else row['icon'],
+                                prefix="fa" if str(row['icon']).startswith("fa-") else None
+                            )
+                            
+                            ).add_to(poi_layer)
+                             
+                    poi_layer.add_to(st.session_state.map)
             
             
             
