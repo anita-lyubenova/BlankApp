@@ -334,8 +334,15 @@ st.markdown(
         margin-left: 20px;
         color: #222222;
         white-space: nowrap;
-        background: #c3cee3;
     }
+    
+    header {
+    background-color: #1E90FF !important;  /* your color */
+    height: 3.5rem !important;             /* adjust height if needed */
+}
+    header .stAppToolbar {
+    background-color: transparent !important;
+}
     
     </style>
     """,
