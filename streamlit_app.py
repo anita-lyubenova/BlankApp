@@ -328,11 +328,11 @@ st.markdown(
      /* App title in header bar */
     header:before {
         content: 'Relocation Navigator';
-        font-size: 18px;
+        font-size: 32px;
         font-weight: 600;
         margin-right: 20px;
         margin-left: 20px;
-        color: #222222;
+        color: #606061;
         white-space: nowrap;
     }
     
