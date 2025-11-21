@@ -139,23 +139,22 @@ def process_elevations(location, radius):
     return nodes, edges
 
 
-def create_map():
-    if 'map' not in st.session_state or st.session_state.map is None:
-        m = folium.Map(location=[59.3327, 18.0656], zoom_start=12)
-        folium.Circle(
-            location=st.session_state.location,
-            radius=st.session_state.POI_radius,  # in meters
-            color='black',       
-            fill=False,
-            weight=2.5            
-            ).add_to(m)
+# def create_map():
+#     if 'map' not in st.session_state or st.session_state.map is None:
+#         m = folium.Map(location=[59.3327, 18.0656], zoom_start=12)
+#         folium.Circle(
+#             location=st.session_state.location,
+#             radius=st.session_state.POI_radius,  # in meters
+#             color='black',       
+#             fill=False,
+#             weight=2.5            
+#             ).add_to(m)
 
-        st.session_state.map = m  # Save the map in the session state
-    return st.session_state.map
+#         st.session_state.map = m  # Save the map in the session state
+#     return st.session_state.map
 
 def show_map():
-    m = create_map()  # Get or create the map
-    folium_static(m)
+    folium_static(st.session_state.map)
 
 def click_button():
     st.session_state.clicked = True    
@@ -214,37 +213,37 @@ tags0 = {
 
  # /* No padding */
  # div[data-testid = 'stMainBlockContainer']{padding: 0rem 0rem 0rem 1rem;} 
-st.markdown(
-    """
-    <style>
+# st.markdown(
+#     """
+#     <style>
    
    
-    div.stButtonGroup {
-        display: flex !important;       /* set label to be on the same line as buttons */
-        align-items: top;            /* vertical align label and pills */
-        gap: 10px;                      /* space between label and buttons */
-    }
+#     div.stButtonGroup {
+#         display: flex !important;       /* set label to be on the same line as buttons */
+#         align-items: top;            /* vertical align label and pills */
+#         gap: 10px;                      /* space between label and buttons */
+#     }
     
-    div.stButtonGroup label {
-        white-space: nowrap !important; /* prevent label from breaking */
-        flex-shrink: 0;                 /* don’t allow the label to shrink */
-        margin-bottom: 0 !important;
-    }
+#     div.stButtonGroup label {
+#         white-space: nowrap !important; /* prevent label from breaking */
+#         flex-shrink: 0;                 /* don’t allow the label to shrink */
+#         margin-bottom: 0 !important;
+#     }
     
-    div.stButtonGroup label div[data-testid='stMarkdownContainer'] p {
-        font-weight: bold !important;
-        margin: 0;  /* optional: remove default margin */
-    }
-    /* Add left margin to the tabs */
-    div[data-baseweb="tab-list"] {margin-left: 50px !important;}
+#     div.stButtonGroup label div[data-testid='stMarkdownContainer'] p {
+#         font-weight: bold !important;
+#         margin: 0;  /* optional: remove default margin */
+#     }
+#     /* Add left margin to the tabs */
+#     div[data-baseweb="tab-list"] {margin-left: 50px !important;}
     
-    /* Add left padding to the tab content panels */
-        div[data-baseweb="tab-panel"] { padding-left: 50px !important;}
+#     /* Add left padding to the tab content panels */
+#         div[data-baseweb="tab-panel"] { padding-left: 50px !important;}
     
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+#     </style>
+#     """,
+#     unsafe_allow_html=True
+# )
 
 intro_text = " Relocation Navigator helps you explore neighborhoods by providing and visualizing information about the local streets, land use, and nearby points of interest. Home seekers, cyclists and pedestrians can get an overview of an unknown neighborhood to inform relocation or travel decisions.Open Street Map data is used to visualize land use patterns and to find amenities like schools, public transport, shops, leisure spots, etc. The app shows walking distances to selected points of interest. Street steepness and shortest distance to key amenities can indicate level of accessibility. "
  
@@ -365,6 +364,9 @@ with tab_map:
             # 11. Add the color scale
             colormap.add_to(st.session_state.map)
             elevation_layer.add_to(st.session_state.map)
+            
+            
+            folium.LayerControl().add_to(st.session_state.map)
 
         else:
             st.error("Address not found!")
