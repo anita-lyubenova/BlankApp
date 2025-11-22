@@ -419,10 +419,14 @@ with tab_map:
     col_address, col_features = cont_input.columns(spec= [0.3, 0.7], gap="small", border=True)
     with col_address:
         st.text_input("Enter an address:", value ="Skaldevägen 60", key="address")
-        st.slider('Show PoIs within:', min_value=100, max_value=2000, value=500, key="POI_radius")
+        st.slider('Radius of interest', min_value=100, max_value=2000, value=500, key="POI_radius")
         
         #st.checkbox("Show land use distribution (might take more time)", value =True, key = "landuse_input")
-    
+        st.html("""
+                <p style='font-size: 0.8rem; color: #555;'>
+                    <em>*Note that the results depend on the quality of OpenStreetMap data, which may contain errors.</em>
+                </p>
+                """)
     with col_features:
         st.write("Select points of interest you'd like to have in the area")
         
@@ -481,7 +485,7 @@ with tab_map:
                 
                 max_grade = 0.15 #edges['grade_abs'].max()
                 colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
-                colormap.caption = 'Street grade'
+                colormap.caption = 'Street steepness'
                 
                 #Add edges as polylines with color based on grade
                 for _, row in st.session_state.edges.iterrows():
