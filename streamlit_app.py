@@ -172,7 +172,7 @@ def get_landuse_data(location, radius, tags):
    
     return pie_data0
 
-
+#@st.cache_data cannot hash
 def aggregate_landuse_data(landuse_data):
     pie_data = landuse_data.groupby(["pie_cat"]).agg(
         total_area_m2 = ("area_m2", "sum"),
@@ -191,7 +191,7 @@ def get_POIs(location, radius, poi_tags):
     
     return poi_data
 
-@st.cache_data
+#@st.cache_data cannot hash
 def available_POIs(location, radius, poi_data):
         G = ox.graph_from_point(location, dist=radius, network_type='walk')
         home_node = ox.nearest_nodes(G, X=location[1], Y=location[0])
