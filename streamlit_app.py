@@ -78,7 +78,7 @@ def melt_tags(gdf, tag_keys):
     melted = gpd.GeoDataFrame(melted, geometry="geometry", crs=gdf.crs)
     return melted
 
-
+@st.cache_data
 def process_elevations(location, radius):
     """
     Fetches elevation data and computes edge grades for a walking network around a given point.
@@ -143,7 +143,8 @@ def show_map():
 
 # def click_button():
 #     st.session_state.clicked = True
-    
+
+@st.cache_data    
 def get_landuse_data(location, radius, tags):
 
     #all_features = get_osm_features(lat, lon, tags0, POI_radius)
@@ -171,6 +172,7 @@ def get_landuse_data(location, radius, tags):
    
     return pie_data0
 
+@st.cache_data
 def aggregate_landuse_data(landuse_data):
     pie_data = landuse_data.groupby(["pie_cat"]).agg(
         total_area_m2 = ("area_m2", "sum"),
@@ -180,6 +182,7 @@ def aggregate_landuse_data(landuse_data):
     
     return pie_data
 
+@st.cache_data
 def get_POIs(location, radius, poi_tags):
     ms_poi = ox.features_from_point(center_point=location, tags=poi_tags, dist=radius)
     poi_data = melt_tags(ms_poi, poi_tags.keys()).reset_index().merge(ms_poi.reset_index()[["id", "name"]], on="id").merge(ms_index[["Category", "Multiselect", "key", "value", "color", "icon"]], on=["key", "value"])
@@ -188,6 +191,7 @@ def get_POIs(location, radius, poi_tags):
     
     return poi_data
 
+@st.cache_data
 def available_POIs(location, radius, poi_data):
         G = ox.graph_from_point(location, dist=radius, network_type='walk')
         home_node = ox.nearest_nodes(G, X=location[1], Y=location[0])
@@ -549,180 +553,8 @@ with tab_map:
         else:
             st.error("Address not found!")
             
-    
-    
-        
 
-                # if no_landuse_input:
-                #     all_features = get_osm_features(lat, lon, tags0, POI_radius)
-                #     #transform to long format
-                #     all_features=melt_tags(all_features, tags0.keys())
-                    
-                #     # Pie chart data ------------------------------------------------------------------------------------------------------
-                #     # get only polygons
-                #     polygon_features = all_features[all_features.geometry.geom_type.isin(["Polygon", "MultiPolygon"])]
-                    
-                #     clipped=clip_to_circle(gdf=polygon_features, lat=lat, lon=lon, radius=POI_radius)
-                    
-                #     #Copmute square meter area per key and value-----------------------
-                #     # Project to metric CRS for accurate areas
-                #     proj_crs = clipped.estimate_utm_crs()
-                #     clipped = clipped.to_crs(proj_crs)
-                #     clipped["area_m2"] = clipped.geometry.area
-                    
-                #     pie_data0 = clipped.merge(pie_index, on=["key", "value"], how="left")
-                #     #pie_data0['pie_cat'] =pie_data0['pie_cat'].fillna('other')
-                #     pie_data0 =pie_data0[pie_data0['pie_cat'].notna()] #remove polygons that are not in the pie index
-                    
-                #     pie_data = pie_data0.groupby(["pie_cat"]).agg(
-                #         total_area_m2 = ("area_m2", "sum"),
-                #         values_included=("value", lambda x: ", ".join(sorted(x.unique())))).reset_index() #concantenate all values within the pie_category
-        
-                #     pie_data["values_included"] = (pie_data["values_included"].str.replace("_", " ")) #remove underscores from the column (for the popup)
-                    
-                #     #pie chart----------------------------------------------------
-                #     fig = px.pie(
-                #         pie_data,
-                #         names="pie_cat",
-                #         values="total_area_m2",
-                #         hover_data=["values_included"],
-                #         color='pie_cat',
-                #         color_discrete_map=color_lookup,
-                #         hole=.5)
-                #     fig.update_traces(
-                #         textinfo="percent+label",
-                #         pull=[0.05]*len(pie_data),
-                #         hovertemplate="<b>%{label}</b><br>%{value:,.0f} m²<br>%{customdata}")
-                    
-                #     fig.update_layout(height=fig_height)
-                    
-                #     ##Land use layer
-                #     keys = pie_data.sort_values("total_area_m2", ascending=False)["pie_cat"].unique()
-                
-                #     landuse_layer = folium.FeatureGroup(name="Land use distribution")
-                    
-                #     folium.GeoJson(
-                #         data=pie_data0,  # All data at once
-                #         style_function=lambda feature: {
-                #             "fillColor": color_lookup.get(feature["properties"]["pie_cat"]),
-                #             "color": "black",
-                #             "weight": 0.3,
-                #             "fillOpacity": 0.5,
-                #         },
-                #         popup=folium.GeoJsonPopup(
-                #             fields=["pie_cat", "key", "value"],
-                #             aliases=["In pie chart", "OSM key", "OSM value"]
-                #         )
-                #     ).add_to(landuse_layer)
-                    
-                #     landuse_layer.add_to(m)
-                
-                
-                
-                # if selected_poi:
-                #     ms_poi = get_osm_features(lat, lon, poi_tags, POI_radius)
-                #     poi_data = melt_tags(ms_poi, poi_tags.keys()).reset_index().merge(ms_poi.reset_index()[["id", "name"]], on="id").merge(ms_index[["Category", "Multiselect", "key", "value", "color", "icon"]], on=["key", "value"])
-                #     poi_data.loc[poi_data['name'].isna(), 'name']="Unnamed"
-                     
-                #     #add layer with PoI markers to map                              
-                #     poi_layer = folium.FeatureGroup(name="Points of Interest")
-                    
-                #     for idx, row in poi_data.iterrows():
-                #         lon_, lat_ = row.geometry.centroid.xy
-                #         folium.Marker(
-                #             location=[lat_[0], lon_[0]],
-                #             popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get('Category','N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
-                #             icon=folium.Icon(
-                #                 color=row['color'],
-                #                 icon=row['icon'].replace("fa-", "") if str(row['icon']).startswith("fa-") else row['icon'],
-                #                 prefix="fa" if str(row['icon']).startswith("fa-") else None
-                #             )
-                            
-                #             ).add_to(poi_layer)
-                             
-                #     poi_layer.add_to(m)
-                    
-                #     #Available PoI: ---------------------------------------------------------------------------------
-                #     G = ox.graph_from_point((lat, lon), dist=POI_radius, network_type='walk')
-                #     home_node = ox.nearest_nodes(G, lon, lat)
-                    
-                #     #change crs to compute centroids of the polygons
-                #     p3857 = poi_data.to_crs(epsg=3857) 
-                #     p3857['centroide'] = p3857.geometry.centroid
-                #     p3857=p3857.set_geometry("centroide")
-    
-                #     p4326=p3857.to_crs(epsg=4326)
-    
-                #     results = []
-                    
-                #     for cat in selected_poi:
-                       
-                #         filtered = p4326[p4326["Multiselect"] == cat]
-                #         if filtered.empty:
-                #             results.append({"Category": cat, "Present": "No", "Name of nearest": None, "Distance to nearest (m)": None})
-                #             continue
-                    
-                #         # map each POI geometry to nearest node
-                #         filtered = filtered.copy()
-                       
-                #         filtered["node"] = filtered.geometry.apply(lambda geom: ox.nearest_nodes(G, geom.x, geom.y))
-                #         # compute walk distance for each
-                #         filtered["walk_dist_m"] = filtered["node"].apply( lambda target_node: nx.shortest_path_length(G, home_node, target_node, weight='length'))
-                        
-                #         # pick nearest by walking
-                #         nearest = filtered.to_crs(epsg=4326).loc[filtered["walk_dist_m"].idxmin()]
-                        
-                #         results.append({"Point of interest": cat,
-                #                         "Present": "Yes",
-                #                         "Name of nearest": nearest["name"],
-                #                         "Distance to nearest (m)": round(nearest["walk_dist_m"])
-                #                        })
-                #     resdf=pd.DataFrame(results)
-                    
-                
-               
-                
-                
-                
-                # folium.LayerControl().add_to(m)
-                
-                
-                
-                # col1,col2 = st.columns(2, gap="small", border=True)    
-                
-                # with col1:
-                #     # st.subheader("Map")
-                #     # st.write("Here you can see land use patterns, elevation profile and where your points of interest are located")
-                #     st_folium(m,use_container_width=True)
-                    
-                #     with st.popover("Degree reference values"):
-                #         st.markdown("""
-                #             - **0–2%**: Very flat street, easy to walk or bike  
-                #             - **2–5%**: Slight incline, barely noticeable  
-                #             - **5–8%**: Moderate slope, noticeable uphill effort  
-                #             - **8–12%**: Steep street, challenging for bikes or long walks  
-                #             - **>12%**: Very steep, strenuous; may be difficult for vehicles, bicycles, or accessibility
-                #             """)
-                #     st.header("Nearest points of interest")
-                            
-                #     if 'resdf' in locals() and not resdf.empty:
-                #         st.dataframe(resdf, key="nearest_pois")
-                #     else:
-                #         st.info("No Points of interest selected.")
-                    
-                    
-                # with col2:
-                #     st.subheader("Land use distribution")
-                    
-                #     if 'fig' in locals():
-                #         st.plotly_chart(fig,
-                #                         use_container_width=True,
-                #                         key="landuse_pie",
-                #                         config = {'height': fig_height})
-                #     else:
-                #         st.info("No landuse characteristics were obtained. If you want to see the landuse distribution, mark the checkbox")
-                   
-                    
+    #Outputs---------------------------------------------------------------------------------            
     col1,col2 = st.columns(2, gap="small", border=True)             
                 
     if st.session_state.location:
