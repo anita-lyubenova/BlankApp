@@ -209,7 +209,7 @@ def available_POIs(location, radius, poi_data):
            
             filtered = p4326[p4326["Multiselect"] == cat]
             if filtered.empty:
-                results.append({"Category": cat, "Present": "No", "Name of nearest": None, "Distance to nearest (m)": None})
+                results.append({"Point of interest": cat, "Present": "No", "Name of nearest": None, "Distance to nearest (m)": None})
                 continue
         
             # map each POI geometry to nearest node
@@ -400,7 +400,7 @@ if 'edges' not in st.session_state:
 if 'landuse_data' not in st.session_state:
     st.session_state.landuse_data = None
 if 'map' not in st.session_state:
-    st.session_state.map = st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=12)
+    st.session_state.map = st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=11)
 if 'piechart' not in st.session_state:
     st.session_state.piechart = None
 if 'poi_data' not in st.session_state:
@@ -564,122 +564,6 @@ with tab_map:
             progress_dialog()
             #with st.status("Processing, please wait...", expanded=True) as status:
                 
-                
-            #     #Base map ---------------------------------------------------------------------
-                
-            #     st.session_state.location = geocode_address(st.session_state.address)
-                
-            #     st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
-            #     # Add address marker
-            #     folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
-            #     folium.Circle(
-            #         location=st.session_state.location,
-            #         radius=st.session_state.POI_radius,  # in meters
-            #         color='black',       
-            #         fill=False,
-            #         weight=2.5            
-            #         ).add_to(st.session_state.map)
-                 
-            
-            #     # Elevation map layer --------------------------------------------------------
-            #     st.write("Process elevation data")
-                
-            #     st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
-
-            #     elevation_layer = folium.FeatureGroup(name="Street steepness")
-                
-            #     max_grade = 0.15 #edges['grade_abs'].max()
-            #     colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
-            #     colormap.caption = 'Street steepness'
-                
-            #     #Add edges as polylines with color based on grade
-            #     for _, row in st.session_state.edges.iterrows():
-            #         coords = [(y, x) for x, y in row.geometry.coords]
-            #         color = colormap(row['grade_abs'])
-            #         folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(elevation_layer)
-                
-               
-            #     colormap.add_to(st.session_state.map)
-            #     elevation_layer.add_to(st.session_state.map)
-                
-                
-                
-            #      #pie chart------------------------------------------------------------------------------------
-            #     st.write("Get and process land use data")
-                
-            #     st.session_state.landuse_data = get_landuse_data(location = st.session_state.location,
-            #                                                      radius = st.session_state.POI_radius,
-            #                                                      tags = tags0)
-              
-            #     st.session_state.piechart = px.pie(
-            #         aggregate_landuse_data(st.session_state.landuse_data),
-            #         names="pie_cat",
-            #         values="total_area_m2",
-            #         hover_data=["values_included"],
-            #         color='pie_cat',
-            #         color_discrete_map=color_lookup,
-            #         hole=.5)
-            #     st.session_state.piechart.update_traces(
-            #         textinfo="percent+label",
-            #         pull=[0.05]*len(aggregate_landuse_data(st.session_state.landuse_data)),
-            #         hovertemplate="<b>%{label}</b><br>%{value:,.0f} m²<br>%{customdata}")
-                
-            #     status.update(
-            #         label="Done!", state="complete", expanded=False
-            #     )
-            
-            
-            #     #Land use map layed --------------------------------------------------------------
-            #     landuse_layer = folium.FeatureGroup(name="Land use distribution")
-                    
-            #     folium.GeoJson(
-            #         data=st.session_state.landuse_data,  # All data at once
-            #         style_function=lambda feature: {
-            #             "fillColor": color_lookup.get(feature["properties"]["pie_cat"]),
-            #             "color": "black",
-            #             "weight": 0.3,
-            #             "fillOpacity": 0.5,
-            #         },
-            #         popup=folium.GeoJsonPopup(
-            #             fields=["pie_cat", "key", "value"],
-            #             aliases=["In pie chart", "OSM key", "OSM value"]
-            #         )
-            #     ).add_to(landuse_layer)
-                
-            #     landuse_layer.add_to(st.session_state.map)
-           
-          
-            
-            #     # POI map layer ----------------------------------------------------------------------------------------
-            #     if selected_poi:
-            #         st.write("Get points of interest")
-            #         st.session_state.poi_data = get_POIs(location = st.session_state.location,
-            #                                              radius = st.session_state.POI_radius,
-            #                                              poi_tags = st.session_state.poi_tags)
-            #         poi_layer = folium.FeatureGroup(name="Points of Interest")
-                        
-            #         for idx, row in st.session_state.poi_data.iterrows():
-            #             lon_, lat_ = row.geometry.centroid.xy
-            #             folium.Marker(
-            #                 location=[lat_[0], lon_[0]],
-            #                 popup= f"<div style='font-size:12px; font-family:Arial; white-space:nowrap;'><b>{row.get('Category','N/A').capitalize()}: </b>{row.get('Multiselect')}<br>{row.get('name', 'Unnamed')}",
-            #                 icon=folium.Icon(
-            #                     color=row['color'],
-            #                     icon=row['icon'].replace("fa-", "") if str(row['icon']).startswith("fa-") else row['icon'],
-            #                     prefix="fa" if str(row['icon']).startswith("fa-") else None
-            #                 )
-                            
-            #                 ).add_to(poi_layer)
-                             
-            #         poi_layer.add_to(st.session_state.map)
-            
-            #         #Available PoI: ---------------------------------------------------------------------------------
-            #         st.session_state.nearest_poi =available_POIs(location = st.session_state.location,
-            #                                                    radius = st.session_state.POI_radius,
-            #                                                    poi_data = st.session_state.poi_data)    
-            
-            # folium.LayerControl().add_to(st.session_state.map)
-            
             
 
         else:
@@ -705,7 +589,7 @@ with tab_map:
             
                 """)
        show_map()
-       if st.session_state.location:
+       if st.session_state.nearest_poi:
            st.dataframe(st.session_state.nearest_poi)
        
     with col2:
