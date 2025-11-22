@@ -78,7 +78,7 @@ def melt_tags(gdf, tag_keys):
     melted = gpd.GeoDataFrame(melted, geometry="geometry", crs=gdf.crs)
     return melted
 
-@st.cache_data
+@st.cache_data(show_spinner=False, show_time = False)
 def process_elevations(location, radius):
     """
     Fetches elevation data and computes edge grades for a walking network around a given point.
@@ -144,7 +144,7 @@ def show_map():
 # def click_button():
 #     st.session_state.clicked = True
 
-@st.cache_data    
+@st.cache_data(show_spinner=False, show_time = False) 
 def get_landuse_data(location, radius, tags):
 
     #all_features = get_osm_features(lat, lon, tags0, POI_radius)
@@ -182,7 +182,7 @@ def aggregate_landuse_data(landuse_data):
     
     return pie_data
 
-@st.cache_data
+@st.cache_data(show_spinner=False, show_time = False)
 def get_POIs(location, radius, poi_tags):
     ms_poi = ox.features_from_point(center_point=location, tags=poi_tags, dist=radius)
     poi_data = melt_tags(ms_poi, poi_tags.keys()).reset_index().merge(ms_poi.reset_index()[["id", "name"]], on="id").merge(ms_index[["Category", "Multiselect", "key", "value", "color", "icon"]], on=["key", "value"])
@@ -268,7 +268,7 @@ def progress_dialog():
          
     
         # Elevation map layer --------------------------------------------------------
-        st.write("Process elevation data")
+       
         
         st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
     
