@@ -138,11 +138,11 @@ def process_elevations(location, radius):
 
     return nodes, edges
 
-def show_map():
-    #folium_static(st.session_state.map)
-    #map_data = st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
-    #return map_data
-    st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
+# def show_map():
+#     #folium_static(st.session_state.map)
+#     #map_data = st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
+#     #return map_data
+#     st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
 
 # def click_button():
 #     st.session_state.clicked = True
@@ -415,8 +415,8 @@ if 'poi_tags' not in st.session_state:
     st.session_state.poi_tags = None
 if 'nearest_poi' not in st.session_state:
     st.session_state.nearest_poi = None
-# if "folium_map" not in st.session_state:
-#     st.session_state.folium_map = show_map()
+if "map_click" not in st.session_state:
+    st.session_state.map_click = None
                  
     
 #Built environment feautres for the pie chart
@@ -597,7 +597,7 @@ with tab_map:
             
                 """)
        #st.session_state.folium_map
-       show_map()
+       st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
