@@ -138,8 +138,8 @@ def process_elevations(location, radius):
 
     return nodes, edges
 
-def show_map():
-    folium_static(st.session_state.map)
+# def show_map():
+#     folium_static(st.session_state.map)
 
 # def click_button():
 #     st.session_state.clicked = True
@@ -212,7 +212,7 @@ def available_POIs(location, radius, poi_data):
                 results.append({"Point of interest": cat,
                                 "Present": "❌",
                                 "Name of nearest": None,
-                                "Distance to nearest (m)": None})
+                                "Walking distance (m)": None})
                 continue
         
             # map each POI geometry to nearest node
@@ -228,7 +228,7 @@ def available_POIs(location, radius, poi_data):
             results.append({"Point of interest": cat,
                             "Present": "✅",
                             "Name of nearest": nearest["name"],
-                            "Distance to nearest (m)": round(nearest["walk_dist_m"])
+                            "Walking distance (m)": round(nearest["walk_dist_m"])
                            })
         results_df=pd.DataFrame(results)
         return results_df
@@ -591,7 +591,7 @@ with tab_map:
                 - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
             
                 """)
-       show_map()
+       st_folium(st.session_state.map)
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
