@@ -26,7 +26,7 @@ geocoder = OpenCageGeocode(OPENCAGE_KEY)
 
 #geolocator = Nominatim(user_agent="Navigator")
 
-@st.cache_data(show_spinner=True, show_time = True)
+@st.cache_data(show_spinner=False, show_time = False)
 def geocode_address(address):
     # geolocator = Nominatim(user_agent="Navigator")
     # return geolocator.geocode(address)
@@ -35,11 +35,11 @@ def geocode_address(address):
     lon = results[0]['geometry']['lng']
     return lat, lon
 
-@st.cache_data(show_spinner=True, show_time = True)
+#@st.cache_data(show_spinner=True, show_time = True)
 # def get_osm_features(location, tags, dist):
 #     return ox.features_from_point(location, tags=tags, dist=dist)
 
-@st.cache_data
+@st.cache_data(show_spinner=False, show_time = False)
 def load_pie_index(sheet):
     df = pd.read_excel("OSM features.xls", sheet_name=sheet)
     df = df.dropna(subset=["key", "value"])
@@ -232,23 +232,6 @@ def available_POIs(location, radius, poi_data):
     
 @st.dialog("Please, wait...",dismissible=False, on_dismiss="ignore")
 def progress_dialog():
-    
-    # if st.session_state.nodes is None:
-    #     #st.write("Get elevation data...")
-    #     st.spinner("Get elevation data...")
-    # else:
-    #     st.write("✅ Get elevation data")
-        
-    # if st.session_state.landuse_data is None:
-    #     st.spinner("Get land use data...")
-    # else:
-    #     st.write("✅ Get land use data")
-        
-    # if st.session_state.poi_data is None:
-    #     st.spinner("Get points of interest...")
-    # else:
-    #     st.write("✅ Get points of interest")
-        
         
     #Base map ---------------------------------------------------------------------
     with st.spinner("Get elevation data...", show_time=True):
@@ -417,7 +400,7 @@ if 'edges' not in st.session_state:
 if 'landuse_data' not in st.session_state:
     st.session_state.landuse_data = None
 if 'map' not in st.session_state:
-    st.session_state.map = None
+    st.session_state.map = st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=12)
 if 'piechart' not in st.session_state:
     st.session_state.piechart = None
 if 'poi_data' not in st.session_state:
@@ -537,7 +520,12 @@ with tab_map:
         st.text_input("Enter an address:", value ="Skaldevägen 60", key="address")
         st.slider('Radius of interest', min_value=100, max_value=2000, value=500, key="POI_radius")
         
-        #st.checkbox("Show land use distribution (might take more time)", value =True, key = "landuse_input")
+        st.html("""
+                <p style='font-size: 0.8rem; color: #555;'>
+                    <em>*Larger radius and busy areas will take longer loading times as there is more data to process.</em>
+                </p>
+                """)
+                
         st.html("""
                 <p style='font-size: 0.8rem; color: #555;'>
                     <em>*Note that the results depend on the quality of OpenStreetMap data, which may contain errors.</em>
