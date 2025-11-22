@@ -689,34 +689,35 @@ with tab_map:
     #Outputs---------------------------------------------------------------------------------            
     col1,col2 = st.columns(2, gap="small", border=True)             
                 
-    if st.session_state.location:
-        with col1:
-           st.subheader("Map")
-           st.write("Here you can see land use patterns, street steepness, and where your points of interest are located. The area colors correspond to the pie chart categories.")
-           #st.write(st.session_state.location)
-           #st_folium(st.session_state.map, width=700, height=500)
-           with st.popover("Steepness reference values"):
-                st.markdown("""
-                    - **0–2%**: Very flat street, easy to walk or bike  
-                    - **2–5%**: Slight incline, barely noticeable  
-                    - **5–8%**: Moderate slope, noticeable uphill effort  
-                    - **8–12%**: Steep street, challenging for bikes or long walks  
-                    - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
-                
-                    """)
-           show_map()
+    
+    with col1:
+       st.subheader("Map")
+       st.write("Given an address, here you can see land use patterns, street steepness, and where your points of interest are located. The area colors correspond to the pie chart categories.")
+       #st.write(st.session_state.location)
+       #st_folium(st.session_state.map, width=700, height=500)
+       with st.popover("Steepness reference values"):
+            st.markdown("""
+                - **0–2%**: Very flat street, easy to walk or bike  
+                - **2–5%**: Slight incline, barely noticeable  
+                - **5–8%**: Moderate slope, noticeable uphill effort  
+                - **8–12%**: Steep street, challenging for bikes or long walks  
+                - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
+            
+                """)
+       show_map()
+       if st.session_state.location:
            st.dataframe(st.session_state.nearest_poi)
-           
-        with col2:
-            st.subheader("Land use distribution")
-            st.write("Here you can see land use distribution across different categories. If you want to remove a category from the pie chart, click on it in the legend.")
+       
+    with col2:
+        st.subheader("Land use distribution")
+        st.write("Here you can see land use distribution across different categories. If you want to remove a category from the pie chart, click on it in the legend.")
+        if st.session_state.location:
             st.plotly_chart(st.session_state.piechart,
                            use_container_width=True,
                            key="landuse_pie",
                            config = {'height': fig_height})
-    else:
-        with col1:
-            show_map()
+        else: 
+            st.image("sample_piechart.png", caption="Example pie chart. Provide an address to replace.")
         
     
     # if selected_poi:
