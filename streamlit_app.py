@@ -517,8 +517,8 @@ with tab_map:
     cont_input = st.container()
     col_address, col_features = cont_input.columns(spec= [0.3, 0.7], gap="small", border=True)
     with col_address:
-        st.text_input("Enter an address:", value ="Skaldevägen 60", key="address")
-        st.slider('Radius of interest', min_value=100, max_value=2000, value=500, key="POI_radius")
+        st.text_input("Enter an address (or choose on the map below):", value ="Skaldevägen 60", key="address")
+        st.slider('Radius of interest (m)', min_value=100, max_value=2000, value=500, key="POI_radius")
         
         st.html("""
                 <p style='font-size: 0.8rem; color: #555;'>
