@@ -230,6 +230,28 @@ def available_POIs(location, radius, poi_data):
         results_df=pd.DataFrame(results)
         return results_df
     
+@st.dialog("Please, wait...",dismissible=False, on_dismiss="ignore")
+def progress_dialog():
+    
+    if st.session_state.nodes is None:
+        #st.write("Get elevation data...")
+        st.spinner("Get elevation data...")
+    else:
+        st.write("✅ Get elevation data")
+        
+    if st.session_state.landuse_data is None:
+        st.spinner("Get land use data...")
+    else:
+        st.write("✅ Get land use data")
+        
+    if st.session_state.poi_data is None:
+        st.spinner("Get points of interest...")
+    else:
+        st.write("✅ Get points of interest")
+        
+    
+    st.rerun()    
+    
 # def show_pie_chart():
 #     st.plotly_chart(st.session_state.piechart,
 #                     use_container_width=True,
@@ -430,11 +452,12 @@ with tab_map:
     # If user enters an address => find latitude and longitude
     if st.button("Go!"): #st.session_state.clicked:
         if st.session_state.address:
+            progress_dialog()
             with st.status("Processing, please wait...", expanded=True) as status:
                 
                 
                 #Base map ---------------------------------------------------------------------
-                st.write("Setting up the map")
+                
                 st.session_state.location = geocode_address(st.session_state.address)
                 
                 st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
