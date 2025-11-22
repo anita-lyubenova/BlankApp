@@ -406,7 +406,7 @@ if 'edges' not in st.session_state:
 if 'landuse_data' not in st.session_state:
     st.session_state.landuse_data = None
 if 'map' not in st.session_state:
-    st.session_state.map = st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=11)
+    st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=11)
 if 'piechart' not in st.session_state:
     st.session_state.piechart = None
 if 'poi_data' not in st.session_state:
@@ -597,7 +597,14 @@ with tab_map:
             
                 """)
        #st.session_state.folium_map
-       st.session_state.map_click= st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
+       m = st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
+       
+       if m["last_clicked"]:
+        st.session_state.map_click= m["last_clicked"]
+        st.write(st.session_state.map_click)
+        #st.rerun()
+        
+        
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
