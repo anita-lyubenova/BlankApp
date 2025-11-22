@@ -714,6 +714,10 @@ with tab_map:
                            use_container_width=True,
                            key="landuse_pie",
                            config = {'height': fig_height})
+    else:
+        with col1:
+            show_map()
+        
     
     # if selected_poi:
     #     st.session_state.poi_data
