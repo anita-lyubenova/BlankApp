@@ -413,6 +413,8 @@ if 'poi_tags' not in st.session_state:
     st.session_state.poi_tags = None
 if 'nearest_poi' not in st.session_state:
     st.session_state.nearest_poi = None
+# if "map_obj" not in st.session_state:
+#     st.session_state.map_obj = st_folium
                  
     
 #Built environment feautres for the pie chart
@@ -592,7 +594,8 @@ with tab_map:
                 - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
             
                 """)
-       show_map()
+       #show_map()
+       map_data = st_folium(st.session_state.map, key="my_map", height=600)
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
