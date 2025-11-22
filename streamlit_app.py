@@ -415,8 +415,8 @@ if 'poi_tags' not in st.session_state:
     st.session_state.poi_tags = None
 if 'nearest_poi' not in st.session_state:
     st.session_state.nearest_poi = None
-if "folium_map" not in st.session_state:
-    st.session_state.folium_map = show_map()
+# if "folium_map" not in st.session_state:
+#     st.session_state.folium_map = show_map()
                  
     
 #Built environment feautres for the pie chart
