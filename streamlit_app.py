@@ -595,7 +595,7 @@ with tab_map:
                 - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
             
                 """)
-       map_data = show_map()
+       st.session_state.folium_map
        
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
