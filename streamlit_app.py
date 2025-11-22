@@ -210,7 +210,7 @@ def available_POIs(location, radius, poi_data):
             filtered = p4326[p4326["Multiselect"] == cat]
             if filtered.empty:
                 results.append({"Point of interest": cat,
-                                "Present": "No",
+                                "Present": "❌",
                                 "Name of nearest": None,
                                 "Distance to nearest (m)": None})
                 continue
@@ -226,7 +226,7 @@ def available_POIs(location, radius, poi_data):
             nearest = filtered.to_crs(epsg=4326).loc[filtered["walk_dist_m"].idxmin()]
             
             results.append({"Point of interest": cat,
-                            "Present": "Yes",
+                            "Present": "✅",
                             "Name of nearest": nearest["name"],
                             "Distance to nearest (m)": round(nearest["walk_dist_m"])
                            })
