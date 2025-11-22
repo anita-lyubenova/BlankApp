@@ -452,7 +452,7 @@ with tab_map:
     # If user enters an address => find latitude and longitude
     if st.button("Go!"): #st.session_state.clicked:
         if st.session_state.address:
-            progress_dialog()
+            #progress_dialog()
             with st.status("Processing, please wait...", expanded=True) as status:
                 
                 
