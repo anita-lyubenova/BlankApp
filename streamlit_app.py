@@ -138,8 +138,9 @@ def process_elevations(location, radius):
 
     return nodes, edges
 
-# def show_map():
-#     folium_static(st.session_state.map)
+def show_map():
+    #folium_static(st.session_state.map)
+    st_folium(st.session_state.map)
 
 # def click_button():
 #     st.session_state.clicked = True
@@ -591,7 +592,7 @@ with tab_map:
                 - **>12%**: Very steep, strenuous; may be difficult for vehicles and bicycles
             
                 """)
-       st_folium(st.session_state.map)
+       show_map()
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
