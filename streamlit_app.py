@@ -597,7 +597,7 @@ with tab_map:
             
                 """)
        #st.session_state.folium_map
-       st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
+       st.session_state.map_click= st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
