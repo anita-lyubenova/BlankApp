@@ -337,7 +337,7 @@ def progress_dialog():
     # POI map layer ----------------------------------------------------------------------------------------
     if selected_poi:
         with st.spinner("Get points of interest...", show_time=True):
-            st.write("Get points of interest")
+            
             st.session_state.poi_data = get_POIs(location = st.session_state.location,
                                                  radius = st.session_state.POI_radius,
                                                  poi_tags = st.session_state.poi_tags)
