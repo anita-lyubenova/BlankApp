@@ -140,8 +140,9 @@ def process_elevations(location, radius):
 
 def show_map():
     #folium_static(st.session_state.map)
-    map_data = st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
-    return map_data
+    #map_data = st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
+    #return map_data
+    st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
 
 # def click_button():
 #     st.session_state.clicked = True
