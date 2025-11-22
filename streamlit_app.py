@@ -592,7 +592,7 @@ with tab_map:
             
                 """)
        show_map()
-       if st.session_state.nearest_poi:
+       if not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
     with col2:
