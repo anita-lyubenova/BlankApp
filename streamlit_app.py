@@ -172,7 +172,7 @@ def get_landuse_data(location, radius, tags):
    
     return pie_data0
 
-@st.cache_data
+
 def aggregate_landuse_data(landuse_data):
     pie_data = landuse_data.groupby(["pie_cat"]).agg(
         total_area_m2 = ("area_m2", "sum"),
