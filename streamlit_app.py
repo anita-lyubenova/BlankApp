@@ -209,7 +209,10 @@ def available_POIs(location, radius, poi_data):
            
             filtered = p4326[p4326["Multiselect"] == cat]
             if filtered.empty:
-                results.append({"Point of interest": cat, "Present": "No", "Name of nearest": None, "Distance to nearest (m)": None})
+                results.append({"Point of interest": cat,
+                                "Present": "No",
+                                "Name of nearest": None,
+                                "Distance to nearest (m)": None})
                 continue
         
             # map each POI geometry to nearest node
