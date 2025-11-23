@@ -17,6 +17,7 @@ import requests
 import time
 import branca.colormap as cm# 8. Create a linear color scale for grade_abs
 from opencage.geocoder import OpenCageGeocode
+from folium.plugins import Draw
 
 # Load OpenCage API key from Streamlit secrets
 OPENCAGE_KEY = st.secrets["opencage"]["api_key"]
@@ -406,7 +407,7 @@ if 'edges' not in st.session_state:
 if 'landuse_data' not in st.session_state:
     st.session_state.landuse_data = None
 if 'map' not in st.session_state:
-    st.session_state.map = st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=11)
+    st.session_state.map = None # st.session_state.map = folium.Map(location=(59.33, 18.06), zoom_start=11)
 if 'piechart' not in st.session_state:
     st.session_state.piechart = None
 if 'poi_data' not in st.session_state:
@@ -598,7 +599,8 @@ with tab_map:
                 """)
        #st.session_state.folium_map
        #st.session_state.map_click= st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
-       folium_static(st.session_state.map)
+       if st.session_state.map is not None:
+           folium_static(st.session_state.map)
        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
            st.dataframe(st.session_state.nearest_poi)
        
