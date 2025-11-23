@@ -561,14 +561,12 @@ with tab_map:
         selected = st_folium(input_map, width=700, height=500, returned_objects=["all_drawings"])
         
         # Check if the user moved the marker => Update location
-        if selected and "all_drawings" in selected is not None:
-            
-            drawings = selected["all_drawings"]
-            if drawings is not None:
-                st.session_state.location = drawings[0]["geometry"]["coordinates"]
-        #else if session.state.address is TRUE => geocode address from that    
-        elif st.session_state.address is not None:
-            st.session_state.location = geocode_address(st.session_state.address)
+        if selected["all_drawings"] is not None:  # there is at least one feature
+            marker_coords = selected["all_drawings"][0]["geometry"]["coordinates"]
+            st.session_state.location = [marker_coords[1],marker_coords[0]]
+        # #else if session.state.address is TRUE => geocode address from that    
+        # elif st.session_state.address is not None:
+        #     st.session_state.location = geocode_address(st.session_state.address)
         
         st.write(f"Marker coordinates: {st.session_state.location}")
         

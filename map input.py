@@ -38,10 +38,9 @@ Draw(
 
 selected = st_folium(input_map, width=700, height=500, returned_objects=["all_drawings"])
 
-# Check if the user moved the marker
-if selected and "all_drawings" in selected:
-    drawings = selected["all_drawings"]
-    if drawings:  # there is at least one feature
-        # For a single marker, get its coordinates
-        marker_coords = drawings[0]["geometry"]["coordinates"]  # [lon, lat]
-        st.write(f"Marker coordinates: {marker_coords}")
+st.write(selected["all_drawings"])
+
+if selected["all_drawings"] is not None:  # there is at least one feature
+    marker_coords = selected["all_drawings"][0]["geometry"]["coordinates"]  # [lon, lat]
+    latlon = [marker_coords[1],marker_coords[0]]
+    st.write(f"Marker coordinates: {latlon}")
