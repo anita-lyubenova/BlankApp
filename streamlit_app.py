@@ -243,7 +243,7 @@ def progress_dialog():
     #Base map ---------------------------------------------------------------------
     with st.spinner("Get elevation data...", show_time=True):
         
-        st.session_state.location = geocode_address(st.session_state.address)
+        #st.session_state.location = geocode_address(st.session_state.address)
         
         st.session_state.map = folium.Map(location=st.session_state.location, zoom_start=14)         
         # Add address marker
@@ -395,7 +395,7 @@ st.set_page_config(page_title=apptitle,
 
 # Initialize session state variables if they don't exist
 if "location" not in st.session_state:
-    st.session_state.location = None
+    st.session_state.location = [59.33, 18.0656]
 # if "map" not in st.session_state:
 #     st.session_state.map = None
 if 'clicked' not in st.session_state:
@@ -529,17 +529,60 @@ with tab_map:
         st.text_input("Enter an address (or choose on the map below):", value ="Skaldevägen 60", key="address")
         st.slider('Radius of interest (m)', min_value=100, max_value=2000, value=500, key="POI_radius")
         
-        st.html("""
-                <p style='font-size: 0.8rem; color: #555;'>
-                    <em>*Larger radius and busy areas will take longer loading times as there is more data to process.</em>
-                </p>
-                """)
+        #input map
+        input_map = folium.Map(location=st.session_state.location, zoom_start=10)
+        
+        # Create feature group that will contain the marker
+        editable = folium.FeatureGroup(name="Editable")
+        input_map.add_child(editable)
+        
+        # Add a marker to be dragged
+        folium.Marker(
+            st.session_state.location,
+            tooltip="Move to the desired location by using the Edit tool to the left"
+        ).add_to(editable)
+        
+        Draw(
+            feature_group=editable,
+            draw_options={           # disable ALL drawing tools
+                "polyline": False,
+                "polygon": False,
+                "circle": False,
+                "rectangle": False,
+                "circlemarker": False,
+                "marker": False
+            },
+            edit_options={           # enable editing of existing layers
+                "edit": True,
+                "remove": False      # you can set True if deletion should be allowed
+            }
+        ).add_to(input_map)
+        
+        selected = st_folium(input_map, width=700, height=500, returned_objects=["all_drawings"])
+        
+        # Check if the user moved the marker => Update location
+        if selected and "all_drawings" in selected:
+            drawings = selected["all_drawings"]
+            st.session_state.location = drawings[0]["geometry"]["coordinates"]
+        #else if session.state.address is TRUE => geocode address from that    
+        elif st.session_state.address:
+            st.session_state.location = geocode_address(st.session_state.address)
+        
+        st.write(f"Marker coordinates: {st.session_state.location}")
+        
+        
+        
+        # st.html("""
+        #         <p style='font-size: 0.8rem; color: #555;'>
+        #             <em>*Larger radius and busy areas will take longer loading times as there is more data to process.</em>
+        #         </p>
+        #         """)
                 
-        st.html("""
-                <p style='font-size: 0.8rem; color: #555;'>
-                    <em>*Note that the results rely on OpenStreetMap data, which may contain errors.</em>
-                </p>
-                """)
+        # st.html("""
+        #         <p style='font-size: 0.8rem; color: #555;'>
+        #             <em>*Note that the results rely on OpenStreetMap data, which may contain errors.</em>
+        #         </p>
+        #         """)
     with col_features:
         st.write("Select points of interest you'd like to have in the area")
         
