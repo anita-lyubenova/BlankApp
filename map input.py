@@ -10,9 +10,7 @@ st.title("Map input")
 
 
 input_map = folium.Map(location=[59.33, 18.0656], zoom_start=10)
-
-
-# Create FEATURE GROUP that will contain the marker
+# Create feature group that will contain the marker
 editable = folium.FeatureGroup(name="Editable")
 input_map.add_child(editable)
 
@@ -21,7 +19,6 @@ folium.Marker(
     [59.33, 18.0656],
     tooltip="Place on the desired location by using the Edit tool to the left"
 ).add_to(editable)
-
 
 Draw(
     feature_group=editable,
@@ -39,6 +36,12 @@ Draw(
     }
 ).add_to(input_map)
 
+selected = st_folium(input_map, width=700, height=500, returned_objects=["all_drawings"])
 
-
-st_folium(input_map, width=700, height=500)
+# Check if the user moved the marker
+if selected and "all_drawings" in selected:
+    drawings = selected["all_drawings"]
+    if drawings:  # there is at least one feature
+        # For a single marker, get its coordinates
+        marker_coords = drawings[0]["geometry"]["coordinates"]  # [lon, lat]
+        st.write(f"Marker coordinates: {marker_coords}")

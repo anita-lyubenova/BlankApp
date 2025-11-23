@@ -537,7 +537,7 @@ with tab_map:
                 
         st.html("""
                 <p style='font-size: 0.8rem; color: #555;'>
-                    <em>*Note that the results depend on the quality of OpenStreetMap data, which may contain errors.</em>
+                    <em>*Note that the results rely on OpenStreetMap data, which may contain errors.</em>
                 </p>
                 """)
     with col_features:
