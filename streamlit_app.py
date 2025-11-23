@@ -559,6 +559,7 @@ with tab_map:
         ).add_to(input_map)
         
         selected = st_folium(input_map,
+                             key= "map_input",
                              width=700,
                              height=500,
                              feature_group_to_add=editable,
