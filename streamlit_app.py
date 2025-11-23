@@ -655,7 +655,7 @@ with tab_map:
     with col2:
         st.subheader("Land use distribution")
         st.write("Here you can see land use distribution across different categories. If you want to remove a category from the pie chart, click on it in the legend.")
-        if st.session_state.location:
+        if st.session_state.st.session_state.piechart:
             st.plotly_chart(st.session_state.piechart,
                            use_container_width=True,
                            key="landuse_pie",
