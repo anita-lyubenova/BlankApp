@@ -418,7 +418,9 @@ if 'nearest_poi' not in st.session_state:
     st.session_state.nearest_poi = None
 if "map_click" not in st.session_state:
     st.session_state.map_click = None
-                 
+if "input_map" not in st.session_state:
+    st.session_state.input_map = None
+                     
     
 #Built environment feautres for the pie chart
 tags0 = {
@@ -530,11 +532,11 @@ with tab_map:
         st.slider('Radius of interest (m)', min_value=100, max_value=2000, value=500, key="POI_radius")
         
         #input map
-        input_map = folium.Map(location=st.session_state.location, zoom_start=10)
+        st.session_state.input_map = folium.Map(location=st.session_state.location, zoom_start=10)
         
         # Create feature group that will contain the marker
         editable = folium.FeatureGroup(name="Editable")
-        input_map.add_child(editable)
+        st.session_state.input_map.add_child(editable)
         
         # Add a marker to be dragged
         folium.Marker(
@@ -556,9 +558,9 @@ with tab_map:
                 "edit": True,
                 "remove": False      # you can set True if deletion should be allowed
             }
-        ).add_to(input_map)
+        ).add_to(st.session_state.input_map)
         
-        selected = st_folium(input_map,
+        selected = st_folium(st.session_state.input_map,
                              key= "map_input",
                              width=700,
                              height=500,
@@ -574,6 +576,7 @@ with tab_map:
         #     st.session_state.location = geocode_address(st.session_state.address)
         
         st.write(f"Marker coordinates: {st.session_state.location}")
+        st.write()
         
         
         
