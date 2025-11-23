@@ -560,8 +560,7 @@ with tab_map:
         
         selected = st_folium(input_map,
                              key= "map_input",
-                             width=700,
-                             height=500,
+                             height=300,
                              feature_group_to_add=editable,
                              returned_objects=["all_drawings"])
         
