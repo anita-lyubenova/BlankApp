@@ -558,7 +558,11 @@ with tab_map:
             }
         ).add_to(input_map)
         
-        selected = st_folium(input_map, width=700, height=500, returned_objects=["all_drawings"])
+        selected = st_folium(input_map,
+                             width=700,
+                             height=500,
+                             feature_group_to_add=editable,
+                             returned_objects=["all_drawings"])
         
         # Check if the user moved the marker => Update location
         if selected["all_drawings"] is not None:  # there is at least one feature
