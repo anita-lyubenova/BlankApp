@@ -1,28 +1,44 @@
+
+
 import streamlit as st
-import leafmap.foliumap as leafmap  # Uses ipyleaflet backend, not folium
+import folium
+from streamlit_folium import st_folium
+from folium.plugins import Draw
 
-st.title("Click map to get coordinates")
 
-# Create map
-m = leafmap.Map(center=[40, -3], zoom=5)
+st.title("Map input")
 
-# Enable click capture
-m.add_basemap("HYBRID")
 
-# Store clicks in session state
-if "clicked" not in st.session_state:
-    st.session_state.clicked = None
+input_map = folium.Map(location=[59.33, 18.0656], zoom_start=10)
 
-def handle_map_click(**kwargs):
-    lat = kwargs.get("lat")
-    lon = kwargs.get("lng")
-    st.session_state.clicked = (lat, lon)
-    # Add marker
-    m.add_marker(location=(lat, lon))
 
-m.on_interaction(handle_map_click)
+# Create FEATURE GROUP that will contain the marker
+editable = folium.FeatureGroup(name="Editable")
+input_map.add_child(editable)
 
-m.to_streamlit(height=600)
+# Add a marker to be dragged
+folium.Marker(
+    [59.33, 18.0656],
+    tooltip="Place on the desired location by using the Edit tool to the left"
+).add_to(editable)
 
-if st.session_state.clicked:
-    st.write("Clicked coordinates:", st.session_state.clicked)
+
+Draw(
+    feature_group=editable,
+    draw_options={           # disable ALL drawing tools
+        "polyline": False,
+        "polygon": False,
+        "circle": False,
+        "rectangle": False,
+        "circlemarker": False,
+        "marker": False
+    },
+    edit_options={           # enable editing of existing layers
+        "edit": True,
+        "remove": False      # you can set True if deletion should be allowed
+    }
+).add_to(input_map)
+
+
+
+st_folium(input_map, width=700, height=500)
