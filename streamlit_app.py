@@ -336,7 +336,7 @@ def progress_dialog():
         st.session_state.topography_gdf = process_topography(st.session_state.nodes)
         
         topography_layer = folium.FeatureGroup(name="Elevation")
-        colormap_tpg = cm.linear.Blues_05.scale(st.session_state.nodes['elevation'].values.min(), st.session_state.nodes['elevation'].values.max())
+        colormap_tpg = cm.linear.Blues_09.scale(st.session_state.nodes['elevation'].values.min(), st.session_state.nodes['elevation'].values.max())
         
         for _, row in st.session_state.topography_gdf.iterrows():
             color = colormap(row['elev'])
