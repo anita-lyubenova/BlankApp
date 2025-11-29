@@ -22,7 +22,7 @@ import numpy as np
 from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
-from shapely.geometry import Polygon
+
 
 # Load OpenCage API key from Streamlit secrets
 OPENCAGE_KEY = st.secrets["opencage"]["api_key"]
@@ -338,7 +338,7 @@ def progress_dialog():
         topography_layer = folium.FeatureGroup(name="Elevation")
         colormap_tpg = cm.linear.Blues_05.scale(st.session_state.nodes['elevation'].values.min(), st.session_state.nodes['elevation'].values.max())
         
-        for _, row in st.session_state.gdf.iterrows():
+        for _, row in st.session_state.topography_gdf.iterrows():
             color = colormap(row['elev'])
         
             folium.GeoJson(
