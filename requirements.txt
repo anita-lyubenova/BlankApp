@@ -13,3 +13,6 @@ textwrap3
 xlrd
 opencage
 scikit-learn
+numpy
+scipy
+matplotlib
