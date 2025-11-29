@@ -441,7 +441,9 @@ tags0 = {
 st.markdown(
     """
     <style>
-
+    
+    div[data-testid = 'stMainBlockContainer']{padding-left: 0rem;}
+    
    /* Add left margin to the tabs */
    div[data-baseweb="tab-list"] {margin-left: 0px !important;}
      
