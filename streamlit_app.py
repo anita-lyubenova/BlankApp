@@ -536,7 +536,11 @@ with tab_map:
         editable = folium.FeatureGroup(name="Editable")
         input_map.add_child(editable)
         
-        
+        # Add a marker to be dragged
+        folium.Marker(
+            st.session_state.location
+           # tooltip="Move to the desired location by using the Edit tool to the left"
+        ).add_to(editable)
         
         # Draw(
         #     feature_group=editable,
@@ -567,12 +571,6 @@ with tab_map:
         # #else if session.state.address is TRUE => geocode address from that    
         # elif st.session_state.address is not None:
         #     st.session_state.location = geocode_address(st.session_state.address)
-        # Add a marker to be dragged
-        folium.Marker(
-            st.session_state.location
-           # tooltip="Move to the desired location by using the Edit tool to the left"
-        ).add_to(editable)
-        
         selected = st_folium(input_map,
                              key= "map_input",
                              height=300,
