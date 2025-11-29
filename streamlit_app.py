@@ -18,6 +18,11 @@ import time
 import branca.colormap as cm# 8. Create a linear color scale for grade_abs
 from opencage.geocoder import OpenCageGeocode
 from folium.plugins import Draw
+import numpy as np
+from scipy.interpolate import griddata
+import matplotlib.pyplot as plt
+from shapely.geometry import Polygon
+from shapely.geometry import Polygon
 
 # Load OpenCage API key from Streamlit secrets
 OPENCAGE_KEY = st.secrets["opencage"]["api_key"]
@@ -236,7 +241,54 @@ def available_POIs(location, radius, poi_data):
                            })
         results_df=pd.DataFrame(results)
         return results_df
+
+def process_topography(nodes):
+    # Extract point coordinates and elevation
+    points = nodes[['x', 'y']].values
+    values = nodes['elevation'].values
     
+    # Bounding box of your node data
+    lng_min, lng_max = nodes['x'].min(), nodes['x'].max()
+    lat_min, lat_max = nodes['y'].min(), nodes['y'].max()
+    
+    grid_x, grid_y = np.mgrid[lng_min:lng_max:400j,lat_min:lat_max:400j]
+
+    # Cubic interpolation
+    grid_z = griddata(points, values, (grid_x, grid_y), method='cubic')
+    
+    # Fill NaN gaps with nearest-neighbor interpolation
+    grid_z_nn = griddata(points, values, (grid_x, grid_y), method='nearest')
+    grid_z = np.where(np.isnan(grid_z), grid_z_nn, grid_z)
+
+    n_levels = 12
+    levels = np.linspace(values.min(), values.max(), n_levels)
+    
+    fig, ax = plt.subplots(figsize=(6,6))
+    cs = ax.contourf(grid_x, grid_y, grid_z, levels=levels, cmap='Blues')
+    
+    polygons = []
+    
+    # cs.allsegs is a list of lists containing polygon coordinates for each level
+    for level_idx, seglist in enumerate(cs.allsegs):
+        elev_value = levels[level_idx]
+    
+        for seg in seglist:
+            try:
+                poly = Polygon(seg)
+                if poly.is_valid and poly.area > 0:
+                    polygons.append({
+                        "geometry": poly,
+                        "elev": float(elev_value)
+                    })
+            except:
+                pass
+
+    gdf = gpd.GeoDataFrame(polygons, crs="EPSG:4326")
+    
+    
+
+    return gdf
+
 @st.dialog("Please, wait...",dismissible=False, on_dismiss="ignore")
 def progress_dialog():
         
@@ -261,7 +313,10 @@ def progress_dialog():
        
         
         st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
+
+    st.write("✅ Get elevation data")
     
+    with st.spinner("Process and plot elevation data...", show_time=True):
         elevation_layer = folium.FeatureGroup(name="Street steepness")
         
         colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
@@ -276,7 +331,30 @@ def progress_dialog():
        
         colormap.add_to(st.session_state.map)
         elevation_layer.add_to(st.session_state.map)
-    st.write("✅ Get elevation data")
+        
+        # Topography layer----------------------------------------------------
+        st.session_state.topography_gdf = process_topography(st.session_state.nodes)
+        
+        topography_layer = folium.FeatureGroup(name="Elevation")
+        colormap_tpg = cm.linear.Blues_05.scale(st.session_state.nodes['elevation'].values.min(), st.session_state.nodes['elevation'].values.max())
+        
+        for _, row in st.session_state.gdf.iterrows():
+            color = colormap(row['elev'])
+        
+            folium.GeoJson(
+                data=row['geometry'].__geo_interface__,
+                style_function=lambda feature, color=color: {
+                    "fillColor": color,
+                    "color": color,
+                    "weight": 0,
+                    "fillOpacity": 0.3
+                },
+                tooltip=f"Elevation: {row['elev']:.1f} m" 
+            ).add_to(topography_layer)
+        
+        topography_layer.add_to(st.session_state.map)
+        colormap_tpg.add_to(st.session_state.map)
+    st.write("✅ Process and plot elevation data")
     
     
      #pie chart------------------------------------------------------------------------------------
@@ -416,9 +494,10 @@ if 'poi_tags' not in st.session_state:
     st.session_state.poi_tags = None
 if 'nearest_poi' not in st.session_state:
     st.session_state.nearest_poi = None
-if "map_click" not in st.session_state:
-    st.session_state.map_click = None
-                 
+if "topography_gdf" not in st.session_state:
+    st.session_state.topography_gdf = None
+if "topography_colormap" not in st.session_state:
+    st.session_state.topography_colormap = None                 
     
 #Built environment feautres for the pie chart
 tags0 = {
