@@ -442,13 +442,9 @@ st.markdown(
     """
     <style>
     
-    div[data-testid = 'stMainBlockContainer']{padding-left: 0rem;}
+    div[data-testid = 'stMainBlockContainer']{padding-left: 1rem;}
     
-   /* Add left margin to the tabs */
-   div[data-baseweb="tab-list"] {margin-left: 0px !important;}
-     
-   /* Add left padding to the tab content panels */
-    div[data-baseweb="tab-panel"] { padding-left: 0px !important;}*/
+
    
     div.stButtonGroup {
         display: flex !important;       /* set label to be on the same line as buttons */
