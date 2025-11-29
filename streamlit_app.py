@@ -339,7 +339,7 @@ def progress_dialog():
         colormap_tpg = cm.linear.Blues_09.scale(st.session_state.nodes['elevation'].values.min(), st.session_state.nodes['elevation'].values.max())
         
         for _, row in st.session_state.topography_gdf.iterrows():
-            color = colormap(row['elev'])
+            color = colormap_tpg(row['elev'])
         
             folium.GeoJson(
                 data=row['geometry'].__geo_interface__,
