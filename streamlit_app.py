@@ -441,7 +441,12 @@ tags0 = {
 st.markdown(
     """
     <style>
-   
+
+   /* Add left margin to the tabs */
+   div[data-baseweb="tab-list"] {margin-left: 10px !important;}
+     
+   /* Add left padding to the tab content panels */
+    div[data-baseweb="tab-panel"] { padding-left: 10px !important;}*/
    
     div.stButtonGroup {
         display: flex !important;       /* set label to be on the same line as buttons */
