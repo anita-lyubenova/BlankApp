@@ -538,25 +538,25 @@ with tab_map:
         
         # Add a marker to be dragged
         folium.Marker(
-            st.session_state.location,
-            tooltip="Move to the desired location by using the Edit tool to the left"
+            st.session_state.location
+           # tooltip="Move to the desired location by using the Edit tool to the left"
         ).add_to(editable)
         
-        Draw(
-            feature_group=editable,
-            draw_options={           # disable ALL drawing tools
-                "polyline": False,
-                "polygon": False,
-                "circle": False,
-                "rectangle": False,
-                "circlemarker": False,
-                "marker": False
-            },
-            edit_options={           # enable editing of existing layers
-                "edit": True,
-                "remove": False      # you can set True if deletion should be allowed
-            }
-        ).add_to(input_map)
+        # Draw(
+        #     feature_group=editable,
+        #     draw_options={           # disable ALL drawing tools
+        #         "polyline": False,
+        #         "polygon": False,
+        #         "circle": False,
+        #         "rectangle": False,
+        #         "circlemarker": False,
+        #         "marker": False
+        #     },
+        #     edit_options={           # enable editing of existing layers
+        #         "edit": True,
+        #         "remove": False      # you can set True if deletion should be allowed
+        #     }
+        # ).add_to(input_map)
         
         selected = st_folium(input_map,
                              key= "map_input",
@@ -564,10 +564,14 @@ with tab_map:
                              feature_group_to_add=editable,
                              returned_objects=["all_drawings"])
         
-        # Check if the user moved the marker => Update location
-        if selected["all_drawings"] is not None:  # there is at least one feature
-            marker_coords = selected["all_drawings"][0]["geometry"]["coordinates"]
-            st.session_state.location = [marker_coords[1],marker_coords[0]]
+        if st.session_state.address is not None:
+             st.session_state.location = geocode_address(st.session_state.address)
+             
+             
+        # # Check if the user moved the marker => Update location
+        # if selected["all_drawings"] is not None:  # there is at least one feature
+        #     marker_coords = selected["all_drawings"][0]["geometry"]["coordinates"]
+        #    st.session_state.location = [marker_coords[1],marker_coords[0]]
         # #else if session.state.address is TRUE => geocode address from that    
         # elif st.session_state.address is not None:
         #     st.session_state.location = geocode_address(st.session_state.address)
