@@ -638,7 +638,7 @@ with tab_map:
 
     #Outputs---------------------------------------------------------------------------------            
     col1,col2 = st.columns(2, gap="small", border=True)             
-                
+    col3,col4 = st.columns(2, gap="small", border=True)              
     
     with col1:
        st.subheader("Map")
@@ -658,8 +658,7 @@ with tab_map:
        #st.session_state.map_click= st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
        if st.session_state.map is not None:
            folium_static(st.session_state.map)
-       if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
-           st.dataframe(st.session_state.nearest_poi)
+       
        
     with col2:
         st.subheader("Land use distribution")
@@ -671,7 +670,11 @@ with tab_map:
                            config = {'height': fig_height})
         else: 
             st.image("sample_piechart.png", caption="Example pie chart. Provide an address to replace.")
-        
+    with col3:
+        st.subheader("Available points of interest")
+        if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
+            st.dataframe(st.session_state.nearest_poi)
+    
     
     # if selected_poi:
     #     st.session_state.poi_data
