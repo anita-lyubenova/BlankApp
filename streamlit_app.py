@@ -354,7 +354,7 @@ def progress_dialog():
         
         topography_layer.add_to(st.session_state.map)
         colormap_tpg.add_to(st.session_state.map)
-    st.write("✅ Get elevation data")
+    st.write("✅ Get and process elevation data")
     
     
      #pie chart------------------------------------------------------------------------------------
