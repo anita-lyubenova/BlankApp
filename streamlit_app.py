@@ -656,7 +656,7 @@ with tab_map:
         ).add_to(editable)
         
         selected = folium_static(input_map,
-                             key= "map_input",
+                            
                              height=300,
                              feature_group_to_add=editable
                             # returned_objects=["all_drawings"]
