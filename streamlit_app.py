@@ -614,9 +614,9 @@ with tab_map:
         #input map
         input_map = folium.Map(location=st.session_state.location, zoom_start=10)
         
-        # Create feature group that will contain the marker
-        editable = folium.FeatureGroup(name="Editable")
-        input_map.add_child(editable)
+        # # Create feature group that will contain the marker
+        # editable = folium.FeatureGroup(name="Editable")
+        # input_map.add_child(editable)
         
         
         
@@ -650,15 +650,14 @@ with tab_map:
         # elif st.session_state.address is not None:
         #     st.session_state.location = geocode_address(st.session_state.address)
         # Add a marker to be dragged
-        folium.Marker(
-            st.session_state.location
-           # tooltip="Move to the desired location by using the Edit tool to the left"
-        ).add_to(editable)
+        # folium.Marker(
+        #     st.session_state.location
+        #    # tooltip="Move to the desired location by using the Edit tool to the left"
+        # ).add_to(editable)
         
         selected = folium_static(input_map,
-                            
                              height=300,
-                             feature_group_to_add=editable
+                            # feature_group_to_add=editable
                             # returned_objects=["all_drawings"]
                              )
         st.write(f"Marker coordinates: {st.session_state.location}")
