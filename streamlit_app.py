@@ -293,7 +293,7 @@ def process_topography(nodes):
 def progress_dialog():
         
     #Base map ---------------------------------------------------------------------
-    with st.spinner("Get elevation data...", show_time=True):
+    with st.spinner("Get and process elevation data", show_time=True):
         
         #st.session_state.location = geocode_address(st.session_state.address)
         
@@ -314,9 +314,9 @@ def progress_dialog():
         
         st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
 
-    st.write("✅ Get elevation data")
     
-    with st.spinner("Process and plot elevation data...", show_time=True):
+    
+   
         elevation_layer = folium.FeatureGroup(name="Street steepness")
         
         colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
@@ -354,11 +354,11 @@ def progress_dialog():
         
         topography_layer.add_to(st.session_state.map)
         colormap_tpg.add_to(st.session_state.map)
-    st.write("✅ Process and plot elevation data")
+    st.write("✅ Get elevation data")
     
     
      #pie chart------------------------------------------------------------------------------------
-    with st.spinner("Get and process land use data...", show_time=True):
+    with st.spinner("Get and process land use data", show_time=True):
     
         
         st.session_state.landuse_data = get_landuse_data(location = st.session_state.location,
@@ -400,11 +400,11 @@ def progress_dialog():
         
         landuse_layer.add_to(st.session_state.map)
     
-    st.write("✅ Get land use data")
+    st.write("✅ Get and process land use data")
 
     # POI map layer ----------------------------------------------------------------------------------------
     if selected_poi:
-        with st.spinner("Get points of interest...", show_time=True):
+        with st.spinner("Get points of interest", show_time=True):
             
             st.session_state.poi_data = get_POIs(location = st.session_state.location,
                                                  radius = st.session_state.POI_radius,
