@@ -289,7 +289,7 @@ def process_topography(nodes):
 
     return gdf
 
-@st.dialog("Please, wait...",dismissible=False, on_dismiss="ignore")
+@st.dialog("Please, wait...",dismissible=False, on_dismiss="ignore", width="medium")
 def progress_dialog():
         
     #Base map ---------------------------------------------------------------------
