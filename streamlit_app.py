@@ -291,6 +291,7 @@ def process_topography(nodes):
 
 @st.dialog("Please, wait...",dismissible=False, on_dismiss="ignore", width="medium")
 def progress_dialog():
+    
         
     #Base map ---------------------------------------------------------------------
     with st.spinner("Get and process elevation data", show_time=True):
@@ -310,14 +311,21 @@ def progress_dialog():
          
     
         # Elevation map layer --------------------------------------------------------
-       
+        st.session_state.elevation_map = folium.Map(location=st.session_state.location, zoom_start=14)         
+       # Add address marker
+        folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
+        folium.Circle(
+           location=st.session_state.location,
+           radius=st.session_state.POI_radius,  # in meters
+           color='black',       
+           fill=False,
+           weight=2.5            
+           ).add_to(st.session_state.elevation_map)
         
         st.session_state.nodes, st.session_state.edges = process_elevations(st.session_state.location, st.session_state.POI_radius)
-
-    
-    
+       
    
-        elevation_layer = folium.FeatureGroup(name="Street steepness")
+        steepness_layer = folium.FeatureGroup(name="Street steepness")
         
         colormap = cm.LinearColormap(["yellow","orange",'red', 'purple', 'blue'], vmin=0, vmax=0.15)
         colormap.caption = 'Street steepness'
@@ -326,17 +334,18 @@ def progress_dialog():
         for _, row in st.session_state.edges.iterrows():
             coords = [(y, x) for x, y in row.geometry.coords]
             color = colormap(row['grade_abs'])
-            folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(elevation_layer)
+            folium.PolyLine(coords, color=color, weight=3, opacity=0.8).add_to(steepness_layer)
         
        
-        colormap.add_to(st.session_state.map)
-        elevation_layer.add_to(st.session_state.map)
+        colormap.add_to(st.session_state.elevation_map)
+        steepness_layer.add_to(st.session_state.elevation_map)
         
         # Topography layer----------------------------------------------------
         st.session_state.topography_gdf = process_topography(st.session_state.nodes)
         
         topography_layer = folium.FeatureGroup(name="Elevation")
         colormap_tpg = cm.linear.Blues_09.scale(st.session_state.nodes['elevation'].values.min(), st.session_state.nodes['elevation'].values.max())
+        colormap_tpg.caption = 'Elevation'
         
         for _, row in st.session_state.topography_gdf.iterrows():
             color = colormap_tpg(row['elev'])
@@ -352,8 +361,8 @@ def progress_dialog():
                 tooltip=f"Elevation: {row['elev']:.1f} m" 
             ).add_to(topography_layer)
         
-        topography_layer.add_to(st.session_state.map)
-        colormap_tpg.add_to(st.session_state.map)
+        topography_layer.add_to(st.session_state.elevation_map)
+        colormap_tpg.add_to(st.session_state.elevation_map)
     st.write("✅ Get and process elevation data")
     
     
@@ -496,8 +505,8 @@ if 'nearest_poi' not in st.session_state:
     st.session_state.nearest_poi = None
 if "topography_gdf" not in st.session_state:
     st.session_state.topography_gdf = None
-if "topography_colormap" not in st.session_state:
-    st.session_state.topography_colormap = None                 
+if "elevation_map" not in st.session_state:
+    st.session_state.elevation_map = None                 
     
 #Built environment feautres for the pie chart
 tags0 = {
@@ -719,8 +728,8 @@ with tab_map:
     col3,col4 = st.columns(2, gap="small", border=True)              
     
     with col1:
-       st.subheader("Map")
-       st.write("Given an address, here you can see land use patterns, street steepness, and where your points of interest are located. The area colors correspond to the pie chart categories.")
+       st.subheader("Points of interest")
+       st.write("Given an address, here you can see land use patterns and where your points of interest are located. The area colors correspond to the pie chart categories.")
        #st.write(st.session_state.location)
        #st_folium(st.session_state.map, width=700, height=500)
        with st.popover("Steepness reference values"):
@@ -748,11 +757,18 @@ with tab_map:
                            config = {'height': fig_height})
         else: 
             st.image("sample_piechart.png", caption="Example pie chart. Provide an address to replace.")
+    
+            
     with col3:
+        st.subheader("Elevation and Street steepness")
+        if st.session_state.map is not None:
+            folium_static(st.session_state.elevation_map)
+        
+    
+    with col4:
         st.subheader("Available points of interest")
         if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
             st.dataframe(st.session_state.nearest_poi)
-    
     
     # if selected_poi:
     #     st.session_state.poi_data
