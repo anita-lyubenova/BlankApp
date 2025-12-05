@@ -655,7 +655,7 @@ with tab_map:
            # tooltip="Move to the desired location by using the Edit tool to the left"
         ).add_to(editable)
         
-        selected = st_folium(input_map,
+        selected = folium_static(input_map,
                              key= "map_input",
                              height=300,
                              feature_group_to_add=editable
