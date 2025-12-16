@@ -768,12 +768,16 @@ with tab_map:
         st.subheader("Elevation and Street steepness")
         if st.session_state.map is not None:
             folium_static(st.session_state.elevation_map)
+        else:
+            st.image("sample_elevation.png", caption="Example elevation chart. Provide an address to replace.")
         
     
     with col4:
         st.subheader("Available points of interest")
         if st.session_state.nearest_poi is not None and not st.session_state.nearest_poi.empty:
             st.dataframe(st.session_state.nearest_poi)
+        else:
+            st.info("Select points of interest in the left menu to show their availability here.")
     
     # if selected_poi:
     #     st.session_state.poi_data
