@@ -313,7 +313,10 @@ def progress_dialog():
         # Elevation map layer --------------------------------------------------------
         st.session_state.elevation_map = folium.Map(location=st.session_state.location, zoom_start=14)         
        # Add address marker
-        folium.Marker(st.session_state.location, popup=st.session_state.address, icon=folium.Icon(color='red', icon='home')).add_to(st.session_state.map)
+        folium.Marker(st.session_state.location,
+                      popup=st.session_state.address,
+                      icon=folium.Icon(color='red',
+                                       icon='home')).add_to(st.session_state.elevation_map)
         folium.Circle(
            location=st.session_state.location,
            radius=st.session_state.POI_radius,  # in meters
@@ -442,6 +445,7 @@ def progress_dialog():
         st.write("✅ Get points of interest")
 
     folium.LayerControl().add_to(st.session_state.map)
+    folium.LayerControl().add_to(st.session_state.elevation_map)
     
     st.rerun()    
     
@@ -745,7 +749,8 @@ with tab_map:
        #st.session_state.map_click= st_folium(st.session_state.map, key="main_map", height=600, returned_objects=["last_clicked"])
        if st.session_state.map is not None:
            folium_static(st.session_state.map)
-       
+       else: 
+            st.image("sample_PoI map.png", caption="Example map. Provide an address to replace.")
        
     with col2:
         st.subheader("Land use distribution")
